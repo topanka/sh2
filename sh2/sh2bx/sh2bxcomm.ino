@@ -35,6 +35,7 @@ int comm_packuccb(int fsBE, int b6pBE, uint16_t *len)
   eval_md_speed(&g_e_mls,&g_e_m2s,&g_e_rdd);
   tscr_md_speed(&g_e_mls,&g_e_m2s,&g_e_rdd);
 
+/*
 if((g_e_mls != 0) || (g_e_m2s != 0)) {
 Serial.print(g_e_mls);
 Serial.print(" ");
@@ -42,6 +43,7 @@ Serial.print(g_e_m2s);
 Serial.print(" ");
 Serial.println();
 }
+*/
   
   eval_ts_pos(&g_e_tsx,&g_e_tsy);
   stb=g_sw10p;

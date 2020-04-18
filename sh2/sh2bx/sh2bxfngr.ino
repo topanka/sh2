@@ -7,6 +7,7 @@
 #define FINSCAN_SERVO_MIN_POS            1400
 #define FINSCAN_SERVO_MAX_POS            2085
 #define FINSCAN_SERVO_STEP               (2100-FINSCAN_SERVO_MAX_POS)
+//#define FINSCAN_SERVO_STEP               25
 
 typedef struct tagMYAVRTIMER {
   volatile uint8_t *tccr;
@@ -88,9 +89,15 @@ void finscan_move(int show)
     }
     if((g_finscan_pos < FINSCAN_SERVO_MAX_POS) || (g_finscan_pos > FINSCAN_SERVO_MIN_POS)) {
       if(show == 1) {
-        if(g_finscan_pos < FINSCAN_SERVO_MAX_POS) g_finscan_pos+=FINSCAN_SERVO_STEP;
+        if(g_finscan_pos < FINSCAN_SERVO_MAX_POS) {
+          g_finscan_pos+=FINSCAN_SERVO_STEP;
+          if(g_finscan_pos > FINSCAN_SERVO_MAX_POS) g_finscan_pos=FINSCAN_SERVO_MAX_POS;
+        }
       } else if(show == 0) {
-        if(g_finscan_pos > FINSCAN_SERVO_MIN_POS) g_finscan_pos-=FINSCAN_SERVO_STEP;
+        if(g_finscan_pos > FINSCAN_SERVO_MIN_POS) {
+          g_finscan_pos-=FINSCAN_SERVO_STEP;
+          if(g_finscan_pos < FINSCAN_SERVO_MIN_POS) g_finscan_pos=FINSCAN_SERVO_MIN_POS;
+        }
       }
       g_servo_finscan.writeMicroseconds(g_finscan_pos);
     }
@@ -160,4 +167,3 @@ int finscan_cancel(void)
 {
   g_finscan_op_onprogress=0;
 }
-

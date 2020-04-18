@@ -1901,7 +1901,7 @@ void dsp_print(void)
   static int l_sw10p=-1;
   int force=0;
 
-  if(g_key == NO_KEY) {
+  if((g_key == NO_KEY) && (g_fs_servo_on == 0)) {
     if(tmr_do(&g_tmr_lcd) != 1) return;
   }
     
@@ -1939,7 +1939,7 @@ void dsp_print(void)
       dsp_scr_pwr(force);
       break;
     case 3:
-    dsp_scr_fingerstick(force);
+      dsp_scr_fingerstick(force);
       dsp_scr_thumbstick(force);
       break;
     case 4:

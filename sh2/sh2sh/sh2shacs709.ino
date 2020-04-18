@@ -1,6 +1,6 @@
 int acs709_setup(void)
 {
-  tmr_init(&g_tmr_acs709_s1,50);
+  tmr_init(&g_tmr_acs709_s1,30);
   return(0);
 }
 
@@ -52,7 +52,7 @@ int acs709_read(void)
 int acs709_get_mA(unsigned char viout_pin, unsigned int vzcr, unsigned int *mA)
 {
   unsigned int viout;
-
+ 
   viout=analogRead(viout_pin);
 //  vzcr=analogRead(vzcr_pin);
 

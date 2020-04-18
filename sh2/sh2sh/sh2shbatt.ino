@@ -29,6 +29,7 @@ int batt_read(int *battV, int *battA)
   static unsigned long l_brtv=0,l_brta=0;
   static int l_bv=0;
   static int l_ba=0;
+  long a;
 
   if((g_millis-l_brtv) >= 500) {
     l_bv=analogRead(UCCB_BATTV_PORT);
@@ -36,9 +37,20 @@ int batt_read(int *battV, int *battA)
     l_bv=round(ra_bv.getAverage()+0.5);
     l_brtv=g_millis;
   }
-  if((g_millis-l_brta) >= 30) {
+  if((g_millis-l_brta) >= 25) {
     l_ba=analogRead(UCCB_BATTA_PORT);
-    ra_ba.addValue(l_ba);
+
+    if(l_ba >= 100) {
+      a=ra_ba.getAverage();
+      if(l_ba > a+10) {
+        l_ba=a+10;
+      } else if(l_ba < a-10) {
+        if(a > 10) {
+          l_ba=a-10;
+        }
+      }
+      ra_ba.addValue(l_ba);
+    }
     l_ba=round(ra_ba.getAverage()+0.5);
     l_brta=g_millis;
   }
