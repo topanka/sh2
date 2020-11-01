@@ -7,7 +7,7 @@
 #include <RunningAverage.h>
 #include <md18v25.h>
 
-#define SH1_VERSION        "1.0.3"
+#define SH2_VERSION        "2.0.1"
 
 //battery
 #define UCCB_BATTV_PORT              A1
