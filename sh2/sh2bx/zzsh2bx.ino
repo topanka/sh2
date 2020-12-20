@@ -23,6 +23,7 @@ void setup()
   sw_setup();
   keyp_setup();
   comm_setup();
+  i2c_setup();
   
   Serial.begin(115200);
   
@@ -62,6 +63,8 @@ void loop()
 //g_b6pBE=BTN_NOP;
 
   keyp_read(&g_key);
+  
+  i2c_processcommand();
 
   comm_send();
   comm_recv();

@@ -4,8 +4,10 @@
 #include <uccbcrc.h>
 #include <sh1tmr.h>
 #include <fim5360.h>
+#include <i2cgen.h>
 
 #include <Servo.h> 
+#include <Wire.h> 
 #include <LiquidCrystal.h>
 #include <Keypad.h>
 #include <RunningAverage.h>
@@ -238,3 +240,6 @@ char *g_master_password=(char*)"6661";
 MYTMR g_tmr_finscan={0};
 int g_finscan_pos=1500;
 Servo g_servo_finscan;
+
+//i2c
+I2CGEN g_i2cbuf;
