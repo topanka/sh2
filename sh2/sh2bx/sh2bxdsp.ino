@@ -222,6 +222,7 @@ void dsp_scr_main(int force)
 //(val-512)/1024*5/185*1000000; 185 mV/A
 //526 a kozepe, 2.57V ad 0 terhelesnel
     xx=(g_battA-526)*26.3936;
+    if(xx <= 26) xx=26;
     lcd.print(xx,10);
     lcd.print("mA ");
     l_battA=g_battA;
@@ -507,12 +508,17 @@ void dsp_scr_ship1(int force)
 void dsp_scr_ship2(int force)
 {
   static unsigned int l_mlc=0;
-  static unsigned int l_m2c=0;
+  static unsigned int l_mRc=0;
   static uint16_t l_mlrpm=0;
   static uint16_t l_m2rpm=0;
   static int l_x=0,l_y=0,l_z=0;
   static int8_t l_mlon=1;
   static int8_t l_m2on=1;
+  static uint8_t l_state_ml=0;
+  static uint8_t l_state_mr=0;
+  static uint8_t l_alert=0;
+  static unsigned long l_alert_tm=0;
+  uint8_t asch=0;
   int x,y,z;
   char buf[25];
   
@@ -523,19 +529,36 @@ void dsp_scr_ship2(int force)
   if(g_b6pBE == 61) {
     g_sh1_mlon=(g_sh1_mlon+1)%2;
   }
+
+  if(l_alert != 0) {
+    if(g_millis > (l_alert_tm+250)) {
+      l_alert_tm=g_millis;
+      asch=1;
+      l_alert=1+(l_alert%2);
+    }
+  }
+  
   if((force == 1) ||
+     (asch == 1) ||
      (l_mlc != g_sh1_mlc) ||
-     (l_m2c != g_sh1_m2c) ||
+     (l_mRc != g_sh1_m2c) ||
      (l_x != x) ||
      (l_y != y) ||
      (l_z != z) ||
      (l_mlon != g_sh1_mlon) ||
      (l_m2on != g_sh1_m2on) ||
+     (l_state_ml != g_sh1_state_ml) ||
+     (l_state_mr != g_sh1_state_mr) ||
      (l_mlrpm != g_sh1_mlrpm) ||
      (l_m2rpm != g_sh1_m2rpm)) {
       
     l_mlon=g_sh1_mlon;
     l_m2on=g_sh1_m2on;
+    l_state_ml=g_sh1_state_ml;
+    l_state_mr=g_sh1_state_mr;
+    
+    if((l_alert == 0) && ((l_state_ml != 0) || (l_state_mr != 0))) l_alert=1;
+    else if((l_state_ml == 0) && (l_state_mr == 0)) l_alert=0;
 
     lcd.setCursor(10,2);
     lcd.print("mRr=");
@@ -563,19 +586,20 @@ void dsp_scr_ship2(int force)
     }
     l_mlrpm=g_sh1_mlrpm;
     
-    lcd.setCursor(10,1);
-    lcd.print("mRc=");
-    if(g_sh1_m2on == 0) {
-      lcd.print("#####");
-    } else {
-      lcd.print(g_sh1_m2c,10);
-      if(g_sh1_m2c > 99) lcd.print("  ");
-      else lcd.print("    ");
-    }
-    l_m2c=g_sh1_m2c;
-    
     lcd.setCursor(0,1);
-    lcd.print("mLc=");
+    if((l_alert == 2) && (g_sh1_state_ml != 0)) {
+      lcd.print("   =");
+    } else {
+      if(g_sh1_state_ml == 0) {
+        lcd.print("mLc=");
+      } else if(g_sh1_state_ml == 1) {
+        lcd.print("SLc=");            //Short circuit
+      } else if(g_sh1_state_ml == 2) {
+        lcd.print("TLc=");            //Over temperature
+      } else if(g_sh1_state_ml == 3) {
+        lcd.print("VLc=");            //Under voltage
+      }
+    }
     if(g_sh1_mlon == 0) {
       lcd.print("#####");
     } else {
@@ -584,6 +608,29 @@ void dsp_scr_ship2(int force)
       else lcd.print("    ");
     }
     l_mlc=g_sh1_mlc;
+    
+    lcd.setCursor(10,1);
+    if((l_alert == 2) && (g_sh1_state_mr != 0)) {
+      lcd.print("   =");
+    } else {
+      if(g_sh1_state_mr == 0) {
+        lcd.print("mRc=");
+      } else if(g_sh1_state_mr == 1) {
+        lcd.print("SRc=");
+      } else if(g_sh1_state_mr == 2) {
+        lcd.print("TRc=");
+      } else if(g_sh1_state_mr == 3) {
+        lcd.print("VRc=");
+      }
+    }
+    if(g_sh1_m2on == 0) {
+      lcd.print("#####");
+    } else {
+      lcd.print(g_sh1_m2c,10);
+      if(g_sh1_m2c > 99) lcd.print("  ");
+      else lcd.print("    ");
+    }
+    l_mRc=g_sh1_m2c;
     
     lcd.setCursor(0,3);
     sprintf(buf,"x=% 4d y=% 4d z=% 4d",x,y,z);

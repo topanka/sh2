@@ -226,7 +226,8 @@ int comm_unpackuccb(unsigned char *buf, unsigned int len,
                     unsigned int *m2c,
                     int16_t *mlrpm,
                     int16_t *m2rpm,
-                    int *temp)
+                    int *temp,
+                    uint8_t *mstate)
 {
   unsigned int l;
   
@@ -239,6 +240,7 @@ int comm_unpackuccb(unsigned char *buf, unsigned int len,
   comm_unpack1((unsigned char *)mlrpm,sizeof(uint16_t),buf,&l);
   comm_unpack1((unsigned char *)m2rpm,sizeof(uint16_t),buf,&l);
   comm_unpack1((unsigned char *)temp,sizeof(int),buf,&l);
+  comm_unpack1((unsigned char *)mstate,sizeof(uint8_t),buf,&l);
 
   return(0);
 }
@@ -247,6 +249,7 @@ int comm_recv(void)
 {
   int ret;
   int16_t rpml,rpm2;
+  uint8_t mstate;
 
 //csakhogy ne olvasson soha  
 //g_commmode=1;
@@ -266,7 +269,8 @@ int comm_recv(void)
                     &g_sh1_m2c,
                     &rpml,
                     &rpm2,
-                    &g_sh1_temperature);
+                    &g_sh1_temperature,
+                    &mstate);
     g_shiptobeready=1;
     g_commmode=1;
     g_sh1_lost_cont=0;
@@ -276,6 +280,8 @@ int comm_recv(void)
     g_sh1_m2rpm=abs(rpm2);
     if(rpm2 >= 0)  g_sh1_m2dir=1;
     else g_sh1_m2dir=-1;
+    g_sh1_state_ml=mstate&0x0F;
+    g_sh1_state_mr=mstate>>4;
   }
 //  g_commmode=1;
 

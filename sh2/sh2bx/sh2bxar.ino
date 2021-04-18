@@ -47,6 +47,14 @@ int smar_analogRead(SMAR *smar)
   } else {
     goto end;
   }
+
+/*
+if(smar->port == UCCB_BATTA_PORT) {
+  Serial.print("read=");
+  Serial.println(sv);
+}
+*/
+  
   v=smar->sum/smar->avn;
   if(abs(sv-v) > smar->vcmin) {
     smar->sum-=smar->tbl[smar->idx];
@@ -87,6 +95,13 @@ int smar_analogRead(SMAR *smar)
   }
 
 end:
+
+/*
+if(smar->port == UCCB_BATTA_PORT) {
+  Serial.print("ret=");
+  Serial.println(rval);
+}
+*/
 
   return(rval);
 }

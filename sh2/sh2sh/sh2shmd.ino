@@ -31,7 +31,7 @@ int MD18V25_init(struct MD18V25 *mdl, struct MD18V25 *mdr)
   mdl->acs709_vzcr_pin=SH2SH_ACS709_VZCRL_PORT;
   mdl->ff2_pin=42;
   mdl->ff1_pin=43;
-  mdl->reset_pin=47;
+  mdl->reset_pin=32;
   mdl->mcra=&g_mcral;
   
   mdr->dir_pin=9;
@@ -41,15 +41,17 @@ int MD18V25_init(struct MD18V25 *mdl, struct MD18V25 *mdr)
   mdr->acs709_vzcr_pin=SH2SH_ACS709_VZCRR_PORT;
   mdr->ff2_pin=30;
   mdr->ff1_pin=31;
-  mdr->reset_pin=32;
+  mdr->reset_pin=47;
   mdr->mcra=&g_mcrar;
   
   pinMode(mdl->dir_pin,OUTPUT);
   pinMode(mdl->pwm_pin,OUTPUT);
+  pinMode(mdl->reset_pin,OUTPUT);
   pinMode(mdl->ff1_pin,INPUT);
   pinMode(mdl->ff2_pin,INPUT);
   pinMode(mdr->dir_pin,OUTPUT);
   pinMode(mdr->pwm_pin,OUTPUT);
+  pinMode(mdr->reset_pin,OUTPUT);
   pinMode(mdr->ff1_pin,INPUT);
   pinMode(mdr->ff2_pin,INPUT);
 
@@ -66,17 +68,23 @@ int MD18V25_init(struct MD18V25 *mdl, struct MD18V25 *mdr)
   MD18V25_calibrate_vzcr(mdl);
   MD18V25_calibrate_vzcr(mdr);
 
-Serial.print(mdl->acs709_vzcr);
-Serial.print(" ");
-Serial.print(mdr->acs709_vzcr);
-Serial.println();
+/*
+  Serial.print(mdl->acs709_vzcr);
+  Serial.print(" ");
+  Serial.print(mdr->acs709_vzcr);
+  Serial.println();
+*/
+
+  digitalWrite(mdl->reset_pin,HIGH);      //enable left motor driver
+  digitalWrite(mdr->reset_pin,HIGH);      //enable right motor driver
 
   return(0);  
 }
 
-int MD18V25_getstate(struct MD18V25 *md)
+int8_t MD18V25_getstate(struct MD18V25 *md)
 {
-  int s=0,ff1,ff2;
+  int ff1,ff2;
+  uint8_t s=0;
   
   ff1=digitalRead(md->ff1_pin);
   ff2=digitalRead(md->ff2_pin);
@@ -123,11 +131,19 @@ Serial.println();
 
 void md_get_state(void)
 {
-  int s1,s2;
-  
-  s1=MD18V25_getstate(&g_mdl);
-  s2=MD18V25_getstate(&g_mdr);
+  g_state_ml=MD18V25_getstate(&g_mdl);
+  g_state_mr=MD18V25_getstate(&g_mdr);
 
+/*
+  if(g_millis%30000 < 4000) g_state_mr=1;
+  else if(g_millis%30000 < 8000) g_state_mr=2;
+  else if(g_millis%30000 < 12000) g_state_mr=3;
+  else if(g_millis%30000 < 16000) g_state_ml=1;
+  else if(g_millis%30000 < 20000) {
+    g_state_ml=2;
+    g_state_mr=3;
+  }
+*/
 /*
 Serial.print("state: ");
 Serial.print(s1);
@@ -168,6 +184,8 @@ int md_checkmc1(struct MD18V25 *md)
   unsigned int mc;
   long a;
 
+  md_get_state();
+  
   acs709_get_mA(md->acs709_viout_pin,md->acs709_vzcr,&mc);
 //  Serial.print(mc);
 //  Serial.print(" ");

@@ -73,6 +73,8 @@ uint16_t g_rpm_m1=0;
 uint16_t g_rpm_m2=0;
 int8_t g_dir_m1=0;
 int8_t g_dir_m2=0;
+uint8_t g_state_ml=0;
+uint8_t g_state_mr=0;
 
 MYTMR g_tmr_checkmc={0};
 

@@ -11,6 +11,7 @@
 #define SW10P_10     953
 */
 
+/*
 #define SW10P_1      92
 #define SW10P_2      188
 #define SW10P_3      283
@@ -21,6 +22,18 @@
 #define SW10P_8      758
 #define SW10P_9      853
 #define SW10P_10     947
+*/
+
+#define SW10P_1      91
+#define SW10P_2      181
+#define SW10P_3      273
+#define SW10P_4      363
+#define SW10P_5      453
+#define SW10P_6      545
+#define SW10P_7      636
+#define SW10P_8      725
+#define SW10P_9      816
+#define SW10P_10     905
 
 #define SW10P_GAP    20
 
@@ -57,6 +70,9 @@ int sw10p_readP(void)
 //  if((millis()-l_sw10prt) < 25) return(l_pos);
   
   l_pos=smar_analogRead(&g_smar_sw10p);
+
+//Serial.println(l_pos);
+  
   if((l_pos > SW10P_1-SW10P_GAP) && (l_pos < SW10P_1+SW10P_GAP)) l_pos=1;
   else if((l_pos > SW10P_2-SW10P_GAP) && (l_pos < SW10P_2+SW10P_GAP)) l_pos=2;
   else if((l_pos > SW10P_3-SW10P_GAP) && (l_pos < SW10P_3+SW10P_GAP)) l_pos=3;
@@ -91,7 +107,7 @@ int b6p_readP(void)
   
   pos=smar_analogRead(&g_smar_b6p);
   
-//  Serial.println(pos);
+//Serial.println(pos);
   
   if((pos > SW10P_1-SW10P_GAP) && (pos < SW10P_1+SW10P_GAP)) pos=1;
   else if((pos > SW10P_2-SW10P_GAP) && (pos < SW10P_2+SW10P_GAP)) pos=2;
@@ -129,4 +145,3 @@ int b6p_btn(int *be)
   
   return(bs);
 }
-

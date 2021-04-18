@@ -146,6 +146,8 @@ int batt_read(void)
   }
   if(tmr_do(&g_tmr_battA) == 1) {
     g_battA=smar_analogRead(&g_smar_battA);
+//Serial.print("batta=");    
+//Serial.println(g_battA);    
   }
 
 /*  
@@ -235,4 +237,3 @@ int tscr_power_switch(void)
   return(0);
 
 }
-

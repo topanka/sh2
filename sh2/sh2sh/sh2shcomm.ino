@@ -31,6 +31,7 @@ int comm_packsh1(uint16_t *len)
   byte crc8;
   unsigned int m1c=0,m2c=0;
   int16_t rpm1,rpm2;
+  uint8_t mstate;
   
   *len=0;
   
@@ -39,6 +40,7 @@ int comm_packsh1(uint16_t *len)
   else rpm1=-(int16_t)g_rpm_m1;
   if(g_dir_m2 >= 0) rpm2=(int16_t)g_rpm_m2;
   else rpm2=-(int16_t)g_rpm_m2;
+  mstate=g_state_ml+(g_state_mr<<4);
 
 /*
   Serial.print(rpm1);
@@ -56,10 +58,11 @@ int comm_packsh1(uint16_t *len)
   comm_pack1((byte*)&rpm1,sizeof(rpm1),g_w_commbuf,len);    //2:15
   comm_pack1((byte*)&rpm2,sizeof(rpm2),g_w_commbuf,len);    //2:17
   comm_pack1((byte*)&g_temperature,sizeof(g_temperature),g_w_commbuf,len);    //2:19
+  comm_pack1((byte*)&mstate,sizeof(mstate),g_w_commbuf,len);    //2:20
   crc8=getCRC(g_w_commbuf,*len);
-  comm_pack1((byte*)&crc8,sizeof(crc8),g_w_commbuf,len);    //1:20
+  comm_pack1((byte*)&crc8,sizeof(crc8),g_w_commbuf,len);    //1:21
   
-//20 byte long  
+//21 byte long  
   
   return(0);
 }
