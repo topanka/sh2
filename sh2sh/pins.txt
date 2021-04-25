@@ -1,4 +1,0 @@
-      acs709 left		      acs709 right		
-FF2   D42 PL7                         D30 PC7 (A15)	orange/white
-FF1   D43 PL6                         D31 PC6 (A14)     orange/white
-RESET D47 PL2 (T5)                    D32 PC5 (A13)     orange
