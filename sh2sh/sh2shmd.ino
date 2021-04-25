@@ -1,0 +1,244 @@
+//left-1, right-2
+
+#define SH1_MOTORCURRENT_MIN      300
+
+struct MD18V25 g_mdl={0};
+struct MD18V25 g_mdr={0};
+
+RunningAverage g_mcral(11);
+RunningAverage g_mcrar=(11);
+
+void MD18V25_calibrate_vzcr(struct MD18V25 *md)
+{
+  unsigned int i,vzcr;
+
+  vzcr=0;
+  for(i=0;i < 11;i++) {
+    vzcr+=analogRead(md->acs709_vzcr_pin);
+  }
+  md->acs709_vzcr=vzcr/11;
+  md->acs709_vzcr+=6;  
+
+  return;
+}
+
+int MD18V25_init(struct MD18V25 *mdl, struct MD18V25 *mdr)
+{
+  mdl->dir_pin=10;
+  mdl->pwm_pin=7;
+  mdl->_OCR=&OCR4B;
+  mdl->acs709_viout_pin=SH2SH_ACS709_VIOUTL_PORT;
+  mdl->acs709_vzcr_pin=SH2SH_ACS709_VZCRL_PORT;
+  mdl->ff2_pin=30;
+  mdl->ff1_pin=31;
+  mdl->reset_pin=33;
+  mdl->mcra=&g_mcral;
+  
+  mdr->dir_pin=9;
+  mdr->pwm_pin=6;
+  mdr->_OCR=&OCR4A;
+  mdr->acs709_viout_pin=SH2SH_ACS709_VIOUTR_PORT;
+  mdr->acs709_vzcr_pin=SH2SH_ACS709_VZCRR_PORT;
+  mdr->ff2_pin=42;
+  mdr->ff1_pin=43;
+  mdr->reset_pin=47;   //right pislog
+  mdr->mcra=&g_mcrar;
+  
+  pinMode(mdl->dir_pin,OUTPUT);
+  pinMode(mdl->pwm_pin,OUTPUT);
+  pinMode(mdl->reset_pin,OUTPUT);
+  pinMode(mdl->ff1_pin,INPUT);
+  pinMode(mdl->ff2_pin,INPUT);
+  pinMode(mdr->dir_pin,OUTPUT);
+  pinMode(mdr->pwm_pin,OUTPUT);
+  pinMode(mdr->reset_pin,OUTPUT);
+  pinMode(mdr->ff1_pin,INPUT);
+  pinMode(mdr->ff2_pin,INPUT);
+
+/*  
+  TCCR1A=0b10100000;
+  TCCR1B=0b00010001;
+  ICR1=400;
+*/
+  
+  TCCR4A = 0b10101000;
+  TCCR4B = 0b00010001;
+  ICR4 = 400;
+
+  MD18V25_calibrate_vzcr(mdl);
+  MD18V25_calibrate_vzcr(mdr);
+
+/*
+  Serial.print(mdl->acs709_vzcr);
+  Serial.print(" ");
+  Serial.print(mdr->acs709_vzcr);
+  Serial.println();
+*/
+
+  digitalWrite(mdl->reset_pin,LOW);      //reset left motor driver
+  digitalWrite(mdr->reset_pin,LOW);      //reset right motor driver
+  delay(100);
+  digitalWrite(mdl->reset_pin,HIGH);      //enable left motor driver
+  digitalWrite(mdr->reset_pin,HIGH);      //enable right motor driver
+
+  return(0);  
+}
+
+int8_t MD18V25_getstate(struct MD18V25 *md)
+{
+  int ff1,ff2;
+  uint8_t s=0;
+  
+  ff1=digitalRead(md->ff1_pin);
+  ff2=digitalRead(md->ff2_pin);
+  if(ff1 == HIGH) s+=1;
+  if(ff2 == HIGH) s+=2;
+
+  return(s);
+}
+
+int MD18V25_setpwr(struct MD18V25 *md, int pwr)
+{
+  uint16_t pwr0;
+
+  if(pwr >= 0) {
+    digitalWrite(md->dir_pin,HIGH);
+    *md->_OCR=(uint16_t)pwr;
+  } else {
+    digitalWrite(md->dir_pin,LOW);
+    *md->_OCR=(uint16_t)(-pwr);
+  }
+  return(0);
+}
+
+void md_setup(void)
+{
+  MD18V25_init(&g_mdl,&g_mdr);
+  
+  tmr_init(&g_tmr_checkmc,10);
+}
+
+void md_calibrate_vzcr(void)
+{
+  MD18V25_calibrate_vzcr(&g_mdl);
+  MD18V25_calibrate_vzcr(&g_mdr);
+
+/*
+Serial.print(g_mdl.acs709_vzcr);
+Serial.print(" ");
+Serial.print(g_mdr.acs709_vzcr);
+Serial.println();
+*/
+  
+}
+
+void md_get_state(void)
+{
+  g_state_ml=MD18V25_getstate(&g_mdl);
+  g_state_mr=MD18V25_getstate(&g_mdr);
+
+/*
+  if(g_millis%30000 < 4000) g_state_mr=1;
+  else if(g_millis%30000 < 8000) g_state_mr=2;
+  else if(g_millis%30000 < 12000) g_state_mr=3;
+  else if(g_millis%30000 < 16000) g_state_ml=1;
+  else if(g_millis%30000 < 20000) {
+    g_state_ml=2;
+    g_state_mr=3;
+  }
+*/
+/*
+Serial.print("state: ");
+Serial.print(s1);
+Serial.print(" ");
+Serial.print(s2);
+Serial.println();
+*/
+  
+}
+
+int md_getmc(unsigned int *m1c, unsigned int *m2c)
+{
+  if(m1c != NULL) {
+    *m1c=g_mdl.mcra->getAverage();
+    if((*m1c < SH1_MOTORCURRENT_MIN) && (g_rpm_m1 == 0)) {
+      *m1c=0;
+    }
+  }
+  if(m2c != NULL) {
+    *m2c=g_mdr.mcra->getAverage();
+    if((*m2c < SH1_MOTORCURRENT_MIN) && (g_rpm_m2 == 0)) {
+      *m2c=0;
+    }
+  }
+
+/*
+  Serial.print("mc: ");
+  Serial.print(*m1c);
+  Serial.print(" ");
+  Serial.print(*m2c);
+  Serial.println();
+*/  
+  return(0);
+}
+
+int md_checkmc1(struct MD18V25 *md)
+{
+  unsigned int mc;
+  long a;
+
+//  md_get_state();
+  
+  acs709_get_mA(md->acs709_viout_pin,md->acs709_vzcr,&mc);
+//  Serial.print(mc);
+//  Serial.print(" ");
+  
+  a=md->mcra->getAverage();
+  if(mc > a+500) {
+    mc=a+500;
+  } else if(mc < a-500) {
+    if(a > 500) {
+      mc=a-500;
+    }
+  }
+  if((g_rpm_m1 == 0) || (mc > 0)) {
+    md->mcra->addValue(mc);
+  }
+  
+  return(0);
+}
+
+int md_checkmc(void)
+{
+  if(tmr_do(&g_tmr_checkmc) != 1) return(0);
+  
+  md_get_state();
+  
+  md_checkmc1(&g_mdl);
+  md_checkmc1(&g_mdr);
+
+  return(1);
+}
+
+int md_setspeed(void)
+{
+
+   if(g_recv_ready != 1) return(0);
+  
+//g_cb_m1s=48;  
+//g_cb_m1s=0;  
+//g_cb_m2s=45;  
+//g_cb_m2s=0;  
+  
+/*
+if((g_cb_mls != 0) || (g_cb_m2s != 0)) {  
+Serial.print(g_cb_mls);
+Serial.print(" ");
+Serial.println(g_cb_m2s);
+}
+*/
+  MD18V25_setpwr(&g_mdl,g_cb_mls);
+  MD18V25_setpwr(&g_mdr,g_cb_m2s);
+
+  return(0);
+}
