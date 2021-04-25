@@ -13,7 +13,11 @@ void loop_counter(void)
 //  md_getmc(&m1c,&m2c);
 //md_calibrate_vzcr();
 //  md_getmc(&m1c,&m2c);
-//md_get_state();
+md_get_state();
+Serial.print("msl: ");
+Serial.println(g_state_ml);
+Serial.print("msr: ");
+Serial.println(g_state_mr);
 
   }
 }

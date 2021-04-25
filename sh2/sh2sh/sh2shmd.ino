@@ -29,9 +29,9 @@ int MD18V25_init(struct MD18V25 *mdl, struct MD18V25 *mdr)
   mdl->_OCR=&OCR4B;
   mdl->acs709_viout_pin=SH2SH_ACS709_VIOUTL_PORT;
   mdl->acs709_vzcr_pin=SH2SH_ACS709_VZCRL_PORT;
-  mdl->ff2_pin=42;
-  mdl->ff1_pin=43;
-  mdl->reset_pin=32;
+  mdl->ff2_pin=30;
+  mdl->ff1_pin=31;
+  mdl->reset_pin=33;
   mdl->mcra=&g_mcral;
   
   mdr->dir_pin=9;
@@ -39,9 +39,9 @@ int MD18V25_init(struct MD18V25 *mdl, struct MD18V25 *mdr)
   mdr->_OCR=&OCR4A;
   mdr->acs709_viout_pin=SH2SH_ACS709_VIOUTR_PORT;
   mdr->acs709_vzcr_pin=SH2SH_ACS709_VZCRR_PORT;
-  mdr->ff2_pin=30;
-  mdr->ff1_pin=31;
-  mdr->reset_pin=47;
+  mdr->ff2_pin=42;
+  mdr->ff1_pin=43;
+  mdr->reset_pin=47;   //right pislog
   mdr->mcra=&g_mcrar;
   
   pinMode(mdl->dir_pin,OUTPUT);
@@ -75,6 +75,9 @@ int MD18V25_init(struct MD18V25 *mdl, struct MD18V25 *mdr)
   Serial.println();
 */
 
+  digitalWrite(mdl->reset_pin,LOW);      //reset left motor driver
+  digitalWrite(mdr->reset_pin,LOW);      //reset right motor driver
+  delay(100);
   digitalWrite(mdl->reset_pin,HIGH);      //enable left motor driver
   digitalWrite(mdr->reset_pin,HIGH);      //enable right motor driver
 
@@ -184,7 +187,7 @@ int md_checkmc1(struct MD18V25 *md)
   unsigned int mc;
   long a;
 
-  md_get_state();
+//  md_get_state();
   
   acs709_get_mA(md->acs709_viout_pin,md->acs709_vzcr,&mc);
 //  Serial.print(mc);
@@ -208,6 +211,8 @@ int md_checkmc1(struct MD18V25 *md)
 int md_checkmc(void)
 {
   if(tmr_do(&g_tmr_checkmc) != 1) return(0);
+  
+  md_get_state();
   
   md_checkmc1(&g_mdl);
   md_checkmc1(&g_mdr);

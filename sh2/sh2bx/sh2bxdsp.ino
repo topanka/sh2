@@ -34,7 +34,7 @@
 
 #define UCCB_DSP_CLB_MAX                     33
 
-#define UCCB_DSP_SH3_OI_NUM                  4
+#define UCCB_DSP_SH3_OI_NUM                  5
 
 #define UCCB_DSP_FINSCAN_OI_NUM              5
 #define UCCB_DSP_ADJPS_OI_NUM                2
@@ -76,6 +76,7 @@ byte h3[8] = {
 unsigned long g_dsp_lastprinttime=0;
 int g_clb_phase=UCCB_DSP_CLB_TSCENX_TXT;
 int g_tools_sml=0;
+int8_t g_sh2_sendingreset=0;
 
 int numPlaces(unsigned long n)
 {
@@ -1562,6 +1563,12 @@ void dsp_scr_ship3(int force)
         l_mode=0;
         lcd.noBlink();
       }
+    } else if(l_oi == 5) {
+      if(g_key == '0') {
+      } else if(g_key == UCCB_KEY_ENTER) {
+        l_mode=0;
+        lcd.noBlink();
+      }
     }
   }  
   
@@ -1649,6 +1656,17 @@ void dsp_scr_ship3(int force)
       l2p++;
     }
     
+    if((diff+5 >= 1) && (diff+5 <= 3)) {
+      lcd.setCursor(0,l2p);
+      if(l_cli == l2p) {
+        lcd.print("*");
+      } else {
+        lcd.print(" ");
+      }
+      lcd.print("Reset MD18V25  (0) ");
+      l2p++;
+    }
+
     if(l_oi == 1) {
       lcd.setCursor(0,l_cli);
     } else if(l_oi == 2) {
@@ -1664,6 +1682,8 @@ void dsp_scr_ship3(int force)
         lcd.setCursor(8,l_cli);
       }
     } else if(l_oi == 4) {
+      lcd.setCursor(0,l_cli);
+    } else if(l_oi == 5) {
       lcd.setCursor(0,l_cli);
     }
     l_key=g_key;
@@ -1960,7 +1980,8 @@ void dsp_print(void)
     force=1;
     dsp_scr_startup();
     g_clb_phase=1;
-  }
+    g_sh2_sendingreset=0;
+ }
   if(g_b6pBE == 11) {
     g_sh1_poslight=UCCB_PL_ON;
     if(g_sw10p == 8) {

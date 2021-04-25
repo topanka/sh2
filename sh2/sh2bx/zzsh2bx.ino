@@ -7,6 +7,9 @@ void loop_counter(void)
     g_loop_ct=g_millis;
   Serial.print("*** loop CPS: ");
   Serial.println(g_loop_cps);
+  Serial.print(g_fs_cenY);
+  Serial.print(" ");
+  Serial.println(g_fsY);
   }
 }
 
