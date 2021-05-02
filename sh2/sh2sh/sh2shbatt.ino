@@ -37,9 +37,8 @@ int batt_read(int *battV, int *battA)
     l_bv=round(ra_bv.getAverage()+0.5);
     l_brtv=g_millis;
   }
-  if((g_millis-l_brta) >= 25) {
+  if((g_millis-l_brta) >= g_batt_read_tmo) {
     l_ba=analogRead(UCCB_BATTA_PORT);
-
     if(l_ba >= 100) {
       a=ra_ba.getAverage();
       if(l_ba > a+10) {
@@ -50,9 +49,12 @@ int batt_read(int *battV, int *battA)
         }
       }
       ra_ba.addValue(l_ba);
+    } else {
+      ra_ba.addValue(100);
     }
     l_ba=round(ra_ba.getAverage()+0.5);
     l_brta=g_millis;
+    batt_curr_cutoff(l_ba);
   }
   
   *battV=l_bv;
@@ -61,20 +63,40 @@ int batt_read(int *battV, int *battA)
   return(0);
 }
 
+
+void batt_curr_cutoff(int ba)
+{
+  float voltage;
+  static int l_limit=0;
+
+  voltage=(5.0/1023.0)*ba;
+  voltage=voltage-g_ACS770_QOV+0.015;
+
+  if(voltage > g_ACS770_cutoff) {
+    l_limit++;
+    g_batt_read_tmo=10;
+  } else {
+    l_limit=0;
+    g_batt_read_tmo=25;
+  }
+
+  if(l_limit > 3) {
+    Serial.print("cutOff: ");
+    Serial.print(g_ACS770_cutoff);
+    Serial.println(" reached");
+  }
+}
+
 void totcurr(void)
 {
-  float FACTOR=40.0/1000.0;
-  float QOV=0.5;
-  float cutOffLimit=1.0;    //1.0 is 1A
-  float cutOff=FACTOR/cutOffLimit;
   float voltage;
   float current;
+  int l_limit=0;
 
-//return(0);
-  
   voltage=(5.0/1023.0)*g_battA;
-  voltage=voltage-QOV+0.015;
-  current=voltage/FACTOR;
+  voltage=voltage-g_ACS770_QOV+0.015;
+  current=voltage/g_ACS770_FACTOR;
+
   Serial.print("totA:");
   Serial.print(g_battA);
   Serial.print(" ");
@@ -82,5 +104,8 @@ void totcurr(void)
   Serial.print(" ");
   Serial.print(current);
   Serial.print(" ");
+  Serial.print(g_ACS770_cutoff);
+  Serial.print(" ");
   Serial.println();
+  
 }

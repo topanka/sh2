@@ -6,6 +6,7 @@
 
 #include <RunningAverage.h>
 #include <md18v25.h>
+#include <limits.h>
 
 #define SH2_VERSION        "2.0.1"
 
@@ -14,6 +15,8 @@
 #define UCCB_BATTA_PORT              A0
 int g_battV=-1;
 int g_battA=-1;
+unsigned long g_batt_read_tmo=25;
+float g_batt_curr_cutoff=1.0;     //tottal current cutoff limit in A
 
 //temperature
 #define UCCB_TEMPERATURE_PORT       A6
@@ -86,3 +89,8 @@ MYTMR g_tmr_checkmc={0};
 #define SH2SH_ACS709_VZCRL_PORT               A5    //voltage reference output
 
 MYTMR g_tmr_acs709_s1={0};
+
+//ACS770LCB-100U-PFF
+float g_ACS770_FACTOR=(40.0/1000.0);
+float g_ACS770_QOV=0.5;
+float g_ACS770_cutoff=((g_ACS770_FACTOR)/g_batt_curr_cutoff);

@@ -24,7 +24,7 @@ int temp_read(void)
   Serial.print(temp%10);
   Serial.println("C");
 */
-//totcurr();  
+//  totcurr();  
 
   return(1);  
 }

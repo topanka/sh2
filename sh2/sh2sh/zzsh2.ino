@@ -1,6 +1,7 @@
 void loop_counter(void)
 {
   unsigned int m1c,m2c; 
+  int ba;
   
   g_loop_cnt++;
   if((g_millis-g_loop_ct) > 1000) {
@@ -13,11 +14,13 @@ void loop_counter(void)
 //  md_getmc(&m1c,&m2c);
 //md_calibrate_vzcr();
 //  md_getmc(&m1c,&m2c);
+/*
 md_get_state();
 Serial.print("msl: ");
 Serial.println(g_state_ml);
 Serial.print("msr: ");
 Serial.println(g_state_mr);
+*/
 
   }
 }

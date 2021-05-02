@@ -52,12 +52,18 @@ int acs709_read(void)
 int acs709_get_mA(unsigned char viout_pin, unsigned int vzcr, unsigned int *mA)
 {
   unsigned int viout;
+  float a;
  
   viout=analogRead(viout_pin);
 //  vzcr=analogRead(vzcr_pin);
 
   if(viout >= vzcr) {
-    *mA=5000.0*(viout-vzcr)/1023.0/0.028;
+    a=5000.0*(viout-vzcr)/1023.0/0.028;
+    if(a > UINT_MAX) {
+      *mA=UINT_MAX;
+    } else {
+      *mA=a;
+    }
   } else {
     *mA=0;
   }
