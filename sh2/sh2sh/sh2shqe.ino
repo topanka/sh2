@@ -262,10 +262,10 @@ uint16_t qe_rpm2_tbi(void)
 //#if 0
  void qe_doit(void)
 {
-   g_rpm_m2=qe_rpm1_tbi();
-   g_rpm_m1=qe_rpm2_tbi();
-   g_dir_m2=g_qe_dir1;
-   g_dir_m1=g_qe_dir2;
+   g_rpm_mr=qe_rpm1_tbi();
+   g_rpm_ml=qe_rpm2_tbi();
+   g_dir_mr=g_qe_dir1;
+   g_dir_ml=g_qe_dir2;
 }
 //#endif
 

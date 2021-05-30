@@ -16,7 +16,8 @@
 int g_battV=-1;
 int g_battA=-1;
 unsigned long g_batt_read_tmo=25;
-float g_batt_curr_cutoff=1.0;     //tottal current cutoff limit in A
+float g_batt_curr_cutoff=2.0;     //total current cutoff limit in A
+int g_batt_cutoff_reached=0;
 
 //temperature
 #define UCCB_TEMPERATURE_PORT       A6
@@ -69,17 +70,20 @@ int g_cb_lightpos=UCCB_PL_OFF;
 MYTMR g_tmr_lightpos={0};
 
 //motor
-int g_cb_mls=0;
-int g_cb_m2s=0;
+int g_cb_msl=0;
+int g_cb_msr=0;
+int g_cb_mdreset=0;
 
-uint16_t g_rpm_m1=0;
-uint16_t g_rpm_m2=0;
-int8_t g_dir_m1=0;
-int8_t g_dir_m2=0;
+uint16_t g_rpm_ml=0;
+uint16_t g_rpm_mr=0;
+int8_t g_dir_ml=0;
+int8_t g_dir_mr=0;
 uint8_t g_state_ml=0;
 uint8_t g_state_mr=0;
 
 MYTMR g_tmr_checkmc={0};
+
+unsigned int g_md_curr_cutoff=1000;     //md current cutoff limit in mA
 
 //ACS709
 #define SH2SH_ACS709_VIOUTR_PORT              A2    //sensor output
@@ -93,4 +97,6 @@ MYTMR g_tmr_acs709_s1={0};
 //ACS770LCB-100U-PFF
 float g_ACS770_FACTOR=(40.0/1000.0);
 float g_ACS770_QOV=0.5;
-float g_ACS770_cutoff=((g_ACS770_FACTOR)/g_batt_curr_cutoff);
+float g_ACS770_cutoff=((g_ACS770_FACTOR)*g_batt_curr_cutoff);
+
+//1-left, 2-right

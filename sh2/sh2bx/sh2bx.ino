@@ -208,6 +208,7 @@ int8_t g_sh1_mlon=1;
 int8_t g_sh1_m2on=1;
 uint8_t g_sh1_state_ml=0;
 uint8_t g_sh1_state_mr=0;
+int g_sh1_mdreset=0;
 
 int g_sh1_poslight=UCCB_PL_OFF;
 int go_sh1_poslight=UCCB_PL_OFF;

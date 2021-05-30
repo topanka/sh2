@@ -78,9 +78,11 @@ void batt_curr_cutoff(int ba)
   } else {
     l_limit=0;
     g_batt_read_tmo=25;
+    g_batt_cutoff_reached=0;
   }
 
   if(l_limit > 3) {
+    g_batt_cutoff_reached=1;
     Serial.print("cutOff: ");
     Serial.print(g_ACS770_cutoff);
     Serial.println(" reached");

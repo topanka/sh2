@@ -1565,6 +1565,7 @@ void dsp_scr_ship3(int force)
       }
     } else if(l_oi == 5) {
       if(g_key == '0') {
+        g_sh1_mdreset=1;
       } else if(g_key == UCCB_KEY_ENTER) {
         l_mode=0;
         lcd.noBlink();

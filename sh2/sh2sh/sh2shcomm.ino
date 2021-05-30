@@ -29,17 +29,17 @@ int comm_packsh1(uint16_t *len)
 {
   byte lead=UCCB_SHIP_LEAD;
   byte crc8;
-  unsigned int m1c=0,m2c=0;
-  int16_t rpm1,rpm2;
+  unsigned int mcl=0,mcr=0;
+  int16_t rpml,rpmr;
   uint8_t mstate;
   
   *len=0;
   
-  md_getmc(&m1c,&m2c);
-  if(g_dir_m1 >= 0) rpm1=(int16_t)g_rpm_m1;
-  else rpm1=-(int16_t)g_rpm_m1;
-  if(g_dir_m2 >= 0) rpm2=(int16_t)g_rpm_m2;
-  else rpm2=-(int16_t)g_rpm_m2;
+  md_getmc(&mcl,&mcr);
+  if(g_dir_ml >= 0) rpml=(int16_t)g_rpm_ml;
+  else rpml=-(int16_t)g_rpm_ml;
+  if(g_dir_mr >= 0) rpmr=(int16_t)g_rpm_mr;
+  else rpmr=-(int16_t)g_rpm_mr;
   mstate=g_state_ml+(g_state_mr<<4);
 
 /*
@@ -53,10 +53,10 @@ int comm_packsh1(uint16_t *len)
   comm_pack1((byte*)&g_loop_cps,sizeof(g_loop_cps),g_w_commbuf,len);    //4:5
   comm_pack1((byte*)&g_battV,sizeof(g_battV),g_w_commbuf,len);    //2:7
   comm_pack1((byte*)&g_battA,sizeof(g_battA),g_w_commbuf,len);    //2:9
-  comm_pack1((byte*)&m1c,sizeof(m1c),g_w_commbuf,len);    //2:11
-  comm_pack1((byte*)&m2c,sizeof(m2c),g_w_commbuf,len);    //2:13
-  comm_pack1((byte*)&rpm1,sizeof(rpm1),g_w_commbuf,len);    //2:15
-  comm_pack1((byte*)&rpm2,sizeof(rpm2),g_w_commbuf,len);    //2:17
+  comm_pack1((byte*)&mcl,sizeof(mcl),g_w_commbuf,len);    //2:11
+  comm_pack1((byte*)&mcr,sizeof(mcr),g_w_commbuf,len);    //2:13
+  comm_pack1((byte*)&rpml,sizeof(rpml),g_w_commbuf,len);    //2:15
+  comm_pack1((byte*)&rpmr,sizeof(rpmr),g_w_commbuf,len);    //2:17
   comm_pack1((byte*)&g_temperature,sizeof(g_temperature),g_w_commbuf,len);    //2:19
   comm_pack1((byte*)&mstate,sizeof(mstate),g_w_commbuf,len);    //2:20
   crc8=getCRC(g_w_commbuf,*len);
@@ -199,7 +199,7 @@ int comm_unpackuccb(unsigned char *buf, unsigned long len,
                     int *fsZ,
                     int *fsBS,
                     int *fsBE,
-                    int *stb,
+                    unsigned int *stb,
                     int *b6pBS,
                     int *b6pBE,
                     int *m1s,
@@ -222,7 +222,7 @@ int comm_unpackuccb(unsigned char *buf, unsigned long len,
   comm_unpack1((unsigned char *)fsZ,sizeof(int),buf,&l);
   comm_unpack1((unsigned char *)fsBS,sizeof(int),buf,&l);
   comm_unpack1((unsigned char *)fsBE,sizeof(int),buf,&l);
-  comm_unpack1((unsigned char *)stb,sizeof(int),buf,&l);
+  comm_unpack1((unsigned char *)stb,sizeof(unsigned int),buf,&l);
   comm_unpack1((unsigned char *)b6pBS,sizeof(int),buf,&l);
   comm_unpack1((unsigned char *)b6pBE,sizeof(int),buf,&l);
   comm_unpack1((unsigned char *)m1s,sizeof(int),buf,&l);
@@ -237,7 +237,8 @@ int comm_unpackuccb(unsigned char *buf, unsigned long len,
 
 int comm_recv(void)
 {
-  int ret,stb;
+  int ret;
+  unsigned int stb;
 
   g_recv_ready=0;
   if(g_commmode == 0) return(0);
@@ -258,17 +259,18 @@ int comm_recv(void)
                     &stb,
                     &g_cb_b6pBS,
                     &g_cb_b6pBE,
-                    &g_cb_mls,
-                    &g_cb_m2s,
+                    &g_cb_msl,
+                    &g_cb_msr,
                     &g_cb_rdd,
                     &g_cb_tsxp,
                     &g_cb_tsyp,
                     &g_commmode);
 
-    g_cb_sw10p=stb&UCCB_ST_SW10P;
-    if((int)(stb&UCCB_ST_M1) == 0) g_cb_mls=0;
-    if((int)(stb&UCCB_ST_M2) == 0) g_cb_m2s=0;
+    g_cb_sw10p=(int)(stb&UCCB_ST_SW10P);
+    if((unsigned int)(stb&UCCB_ST_M1) == 0) g_cb_msl=0;
+    if((unsigned int)(stb&UCCB_ST_M2) == 0) g_cb_msr=0;
     g_cb_lightpos=(int)((stb&UCCB_ST_POSLIGHT)>>UCCB_PL_STPOS);
+    if((unsigned int)(stb&UCCB_ST_MD_RESET) == UCCB_ST_MD_RESET) g_cb_mdreset=1;
     
     g_recv_ready=1;
 //    Serial.println("packet read");

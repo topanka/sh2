@@ -8,8 +8,12 @@ void loop_counter(void)
     g_loop_cps=g_loop_cnt;
     g_loop_cnt=0;
     g_loop_ct=g_millis;
-  Serial.print("*** loop CPS: ");
+  Serial.print("*** loop SH CPS: ");
   Serial.println(g_loop_cps);
+  if(g_cb_mdreset == 1) {
+    Serial.println("md reset request frombox");
+    g_cb_mdreset=0;
+  }
   
 //  md_getmc(&m1c,&m2c);
 //md_calibrate_vzcr();

@@ -28,7 +28,7 @@ int comm_packuccb(int fsBE, int b6pBE, uint16_t *len)
 {
   byte lead=UCCB_CBOX_LEAD;
   byte crc8;
-  int stb;
+  unsigned int stb;
   
   *len=0;
 
@@ -51,6 +51,11 @@ Serial.println();
   if(g_sh1_m2on == 1) stb|=UCCB_ST_M2;
   if(g_sh1_poslight == UCCB_PL_ON) stb|=(UCCB_PL_ON<<UCCB_PL_STPOS);
   if(g_sh1_poslight == UCCB_PL_BLINK) stb|=(UCCB_PL_BLINK<<UCCB_PL_STPOS);
+  if(g_sh1_mdreset == 1) {
+    stb|=UCCB_ST_MD_RESET;
+    g_sh1_mdreset=0;
+    Serial.println("md reset sent");
+  }
   
   comm_pack1((byte*)&lead,sizeof(lead),g_w_commbuf,len);      //1:1
   comm_pack1((byte*)&g_w_commpkt_counter,sizeof(g_w_commpkt_counter),g_w_commbuf,len);    //4:5-32
