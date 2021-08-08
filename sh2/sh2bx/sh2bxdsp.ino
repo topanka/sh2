@@ -1446,6 +1446,7 @@ void dsp_scr_tools(int force)
 //2. speed
 //3. rotation scale
 //4. motor on/off
+//5. md reset
 
 void dsp_scr_ship3(int force)
 {

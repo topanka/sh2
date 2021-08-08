@@ -11,6 +11,8 @@ int eval_doit(void)
   static int l_lastlightpos=UCCB_PL_OFF;
   
 //  if(g_recv_ready != 1) return(0);
+
+  md_reset();
   
   if((g_cb_fsBE == 11) && (g_recv_ready == 1)) {
     sw++;
@@ -68,4 +70,3 @@ int eval_doit(void)
   
   return(1);
 }
-

@@ -24,16 +24,16 @@
 #define SW10P_10     947
 */
 
-#define SW10P_1      91
-#define SW10P_2      181
-#define SW10P_3      273
-#define SW10P_4      363
-#define SW10P_5      453
-#define SW10P_6      545
-#define SW10P_7      636
-#define SW10P_8      725
-#define SW10P_9      816
-#define SW10P_10     905
+#define SW10P_1      92
+#define SW10P_2      185
+#define SW10P_3      277
+#define SW10P_4      369
+#define SW10P_5      462
+#define SW10P_6      556
+#define SW10P_7      647
+#define SW10P_8      740
+#define SW10P_9      834
+#define SW10P_10     925
 
 #define SW10P_GAP    20
 
@@ -64,25 +64,33 @@ int sw10p_readA(void)
 int sw10p_readP(void)
 {
   static int l_pos=-1;
+  static int o_pos=-1;
+  int pos;
 //  static unsigned long l_sw10prt=0;
   
   if(tmr_do(&g_tmr_sw10p) != 1) return(l_pos);
 //  if((millis()-l_sw10prt) < 25) return(l_pos);
   
-  l_pos=smar_analogRead(&g_smar_sw10p);
+  pos=smar_analogRead(&g_smar_sw10p);
 
-//Serial.println(l_pos);
+/*
+if(pos != o_pos) {
+  Serial.println(pos);
+}
+*/
+
+  o_pos=pos;
   
-  if((l_pos > SW10P_1-SW10P_GAP) && (l_pos < SW10P_1+SW10P_GAP)) l_pos=1;
-  else if((l_pos > SW10P_2-SW10P_GAP) && (l_pos < SW10P_2+SW10P_GAP)) l_pos=2;
-  else if((l_pos > SW10P_3-SW10P_GAP) && (l_pos < SW10P_3+SW10P_GAP)) l_pos=3;
-  else if((l_pos > SW10P_4-SW10P_GAP) && (l_pos < SW10P_4+SW10P_GAP)) l_pos=4;
-  else if((l_pos > SW10P_5-SW10P_GAP) && (l_pos < SW10P_5+SW10P_GAP)) l_pos=5;
-  else if((l_pos > SW10P_6-SW10P_GAP) && (l_pos < SW10P_6+SW10P_GAP)) l_pos=6;
-  else if((l_pos > SW10P_7-SW10P_GAP) && (l_pos < SW10P_7+SW10P_GAP)) l_pos=7;
-  else if((l_pos > SW10P_8-SW10P_GAP) && (l_pos < SW10P_8+SW10P_GAP)) l_pos=8;
-  else if((l_pos > SW10P_9-SW10P_GAP) && (l_pos < SW10P_9+SW10P_GAP)) l_pos=9;
-  else if((l_pos > SW10P_10-SW10P_GAP) && (l_pos < SW10P_10+SW10P_GAP)) l_pos=10;
+  if((pos > SW10P_1-SW10P_GAP) && (pos < SW10P_1+SW10P_GAP)) l_pos=1;
+  else if((pos > SW10P_2-SW10P_GAP) && (pos < SW10P_2+SW10P_GAP)) l_pos=2;
+  else if((pos > SW10P_3-SW10P_GAP) && (pos < SW10P_3+SW10P_GAP)) l_pos=3;
+  else if((pos > SW10P_4-SW10P_GAP) && (pos < SW10P_4+SW10P_GAP)) l_pos=4;
+  else if((pos > SW10P_5-SW10P_GAP) && (pos < SW10P_5+SW10P_GAP)) l_pos=5;
+  else if((pos > SW10P_6-SW10P_GAP) && (pos < SW10P_6+SW10P_GAP)) l_pos=6;
+  else if((pos > SW10P_7-SW10P_GAP) && (pos < SW10P_7+SW10P_GAP)) l_pos=7;
+  else if((pos > SW10P_8-SW10P_GAP) && (pos < SW10P_8+SW10P_GAP)) l_pos=8;
+  else if((pos > SW10P_9-SW10P_GAP) && (pos < SW10P_9+SW10P_GAP)) l_pos=9;
+  else if((pos > SW10P_10-SW10P_GAP) && (pos < SW10P_10+SW10P_GAP)) l_pos=10;
   else l_pos=0;
   
 //  l_sw10prt=millis();

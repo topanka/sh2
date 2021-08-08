@@ -22,6 +22,17 @@ void MD18V25_calibrate_vzcr(struct MD18V25 *md)
   return;
 }
 
+int MD18V25_reset(struct MD18V25 *mdl, struct MD18V25 *mdr)
+{
+  digitalWrite(mdl->reset_pin,LOW);      //reset left motor driver
+  digitalWrite(mdr->reset_pin,LOW);      //reset right motor driver
+  delay(100);
+  digitalWrite(mdl->reset_pin,HIGH);      //enable left motor driver
+  digitalWrite(mdr->reset_pin,HIGH);      //enable right motor driver
+
+  return(0);
+}
+
 int MD18V25_init(struct MD18V25 *mdl, struct MD18V25 *mdr)
 {
   mdl->dir_pin=10;
@@ -77,11 +88,7 @@ int MD18V25_init(struct MD18V25 *mdl, struct MD18V25 *mdr)
   Serial.println();
 */
 
-  digitalWrite(mdl->reset_pin,LOW);      //reset left motor driver
-  digitalWrite(mdr->reset_pin,LOW);      //reset right motor driver
-  delay(100);
-  digitalWrite(mdl->reset_pin,HIGH);      //enable left motor driver
-  digitalWrite(mdr->reset_pin,HIGH);      //enable right motor driver
+  MD18V25_reset(mdl,mdr);
 
   return(0);  
 }
@@ -272,6 +279,18 @@ if((g_cb_msl != 0) || (g_cb_msr != 0)) {
 
   MD18V25_setpwr(&g_mdl,-g_cb_msl);
   MD18V25_setpwr(&g_mdr,g_cb_msr);
+
+  return(0);
+}
+
+int md_reset(void)
+{
+  if(g_cb_mdreset != 1) return(0);
+
+  MD18V25_reset(&g_mdl,&g_mdr);
+  g_cb_mdreset=0;
+  
+  Serial.println("md reset completed");
 
   return(0);
 }

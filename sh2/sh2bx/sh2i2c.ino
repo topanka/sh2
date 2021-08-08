@@ -74,6 +74,7 @@ void i2c_processcommand(void)
 */    
     return;
   }
+  Serial.print("Running command: ");
   Serial.println(g_i2cbuf.buf);
   g_i2cbuf.len=0;
   g_i2cbuf.state=0;
