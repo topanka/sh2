@@ -186,7 +186,7 @@ void dsp_scr_main(int force)
   static int l_battV=-1;
   static int l_battA=-1;
   static unsigned long l_loop_cps=0;
-  static unsigned long l_scnt=0;
+//  static unsigned long l_scnt=0;
   static unsigned long l_slc=0;
   int ret;
   uint8_t x;
@@ -240,7 +240,7 @@ void dsp_scr_main(int force)
     lcd.print("scnt=");
     lcd.print(g_scnt,10);
     lcd.print("  ");
-    l_scnt=g_scnt;
+//    l_scnt=g_scnt;
     
     if(g_sh1_lost_cont == 0) {
       lcd.setCursor(10,3);
@@ -445,7 +445,7 @@ void dsp_scr_ship1(int force)
      (l_mlc != g_sh1_mlc) ||
      (l_m2c != g_sh1_m2c) ||
      (l_temp != g_sh1_temperature) ||
-     (l_sh1_w_commpkt_counter != g_sh1_w_commpkt_counter)) {
+     (l_sh1_w_commpkt_counter != (int)g_sh1_w_commpkt_counter)) {
     lcd.setCursor(0,1);
     lcd.print("main:");
     if(g_sh1_battV < 0) {
@@ -725,7 +725,7 @@ void dsp_scr_fingerscan(int force)
   static int l_oi=1;
   static int l_key=NO_KEY;
   static int l_mode=0;
-  static int l_pwd_pos=0;
+  static unsigned int l_pwd_pos=0;
   static char l_pwd[10]={0};
   int diff,l2p,fsret;
 
@@ -976,7 +976,7 @@ void dsp_scr_adjps(int force)
   static int l_oi=1;
   static int l_key=NO_KEY;
   static int l_mode=0;
-  int diff,l2p,fsret;
+  int diff,l2p;
 
   if(force == 1) l_mode=0;
   if(l_mode == 1) {
@@ -1567,6 +1567,7 @@ void dsp_scr_ship3(int force)
     } else if(l_oi == 5) {
       if(g_key == '0') {
         g_sh1_mdreset=1;
+        force=1;
       } else if(g_key == UCCB_KEY_ENTER) {
         l_mode=0;
         lcd.noBlink();
@@ -1665,7 +1666,11 @@ void dsp_scr_ship3(int force)
       } else {
         lcd.print(" ");
       }
-      lcd.print("Reset MD18V25  (0) ");
+      if(g_sh1_mdreset == 1) {
+        lcd.print("Reseting MD18V25...");
+      } else {
+        lcd.print("Reset MD18V25  (0) ");
+      }
       l2p++;
     }
 
@@ -1832,7 +1837,7 @@ void dsp_scr_calibration(int force)
 {
   static int l_val=0;
   static int l_cp=0;
-  int ret,v;
+  int v;
   
   if(force == 1) {
   }

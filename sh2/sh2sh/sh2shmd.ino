@@ -1,6 +1,7 @@
 //left-1, right-2
 
-#define SH1_MOTORCURRENT_MIN      300
+#define SH2_MOTORCURRENT_MIN      300
+//#define SH2_MOTORSPEED_LIMIT      60
 
 struct MD18V25 g_mdl={0};
 struct MD18V25 g_mdr={0};
@@ -17,7 +18,31 @@ void MD18V25_calibrate_vzcr(struct MD18V25 *md)
     vzcr+=analogRead(md->acs709_vzcr_pin);
   }
   md->acs709_vzcr=vzcr/11;
-  md->acs709_vzcr+=6;  
+//  md->acs709_vzcr+=6;  
+
+Serial.print("VZCR: ");
+Serial.println(md->acs709_vzcr);
+
+  return;
+}
+
+void MD18V25_calibrate_vzcr_offset(struct MD18V25 *md)
+{
+  unsigned int i;
+  int viout,vzcr;
+
+  viout=0;
+  vzcr=0;
+  for(i=0;i < 11;i++) {
+    viout+=analogRead(md->acs709_viout_pin);
+    vzcr+=analogRead(md->acs709_vzcr_pin);
+  }
+  md->acs709_vzcr_offset=(viout-vzcr)/11;
+
+Serial.print("VZCR offset: ");
+Serial.println(md->acs709_vzcr_offset);
+
+  md->acs709_vzcr+=(md->acs709_vzcr_offset+2);
 
   return;
 }
@@ -45,6 +70,7 @@ int MD18V25_init(struct MD18V25 *mdl, struct MD18V25 *mdr)
   mdl->reset_pin=33;
   mdl->mcra=&g_mcral;
   mdl->curr_cutoff_reached=0;
+  mdl->overloaded=0;
   
   mdr->dir_pin=9;
   mdr->pwm_pin=6;
@@ -56,6 +82,7 @@ int MD18V25_init(struct MD18V25 *mdl, struct MD18V25 *mdr)
   mdr->reset_pin=47;   //right pislog
   mdr->mcra=&g_mcrar;
   mdr->curr_cutoff_reached=0;
+  mdr->overloaded=0;
   
   pinMode(mdl->dir_pin,OUTPUT);
   pinMode(mdl->pwm_pin,OUTPUT);
@@ -80,6 +107,9 @@ int MD18V25_init(struct MD18V25 *mdl, struct MD18V25 *mdr)
 
   MD18V25_calibrate_vzcr(mdl);
   MD18V25_calibrate_vzcr(mdr);
+
+  MD18V25_calibrate_vzcr_offset(mdl);
+  MD18V25_calibrate_vzcr_offset(mdr);
 
 /*
   Serial.print(mdl->acs709_vzcr);
@@ -108,8 +138,6 @@ int8_t MD18V25_getstate(struct MD18V25 *md)
 
 int MD18V25_setpwr(struct MD18V25 *md, int pwr)
 {
-  uint16_t pwr0;
-
   if(pwr >= 0) {
     digitalWrite(md->dir_pin,HIGH);
     *md->_OCR=(uint16_t)pwr;
@@ -131,6 +159,20 @@ void md_calibrate_vzcr(void)
 {
   MD18V25_calibrate_vzcr(&g_mdl);
   MD18V25_calibrate_vzcr(&g_mdr);
+
+/*
+Serial.print(g_mdl.acs709_vzcr);
+Serial.print(" ");
+Serial.print(g_mdr.acs709_vzcr);
+Serial.println();
+*/
+  
+}
+
+void md_calibrate_vzcr_offset(void)
+{
+  MD18V25_calibrate_vzcr_offset(&g_mdl);
+  MD18V25_calibrate_vzcr_offset(&g_mdr);
 
 /*
 Serial.print(g_mdl.acs709_vzcr);
@@ -170,13 +212,13 @@ int md_getmc(unsigned int *mcl, unsigned int *mcr)
 {
   if(mcl != NULL) {
     *mcl=g_mdl.mcra->getAverage();
-    if((*mcl < SH1_MOTORCURRENT_MIN) && (g_rpm_ml == 0)) {
+    if((*mcl < SH2_MOTORCURRENT_MIN) && (g_rpm_ml == 0)) {
       *mcl=0;
     }
   }
   if(mcr != NULL) {
     *mcr=g_mdr.mcra->getAverage();
-    if((*mcr < SH1_MOTORCURRENT_MIN) && (g_rpm_mr == 0)) {
+    if((*mcr < SH2_MOTORCURRENT_MIN) && (g_rpm_mr == 0)) {
       *mcr=0;
     }
   }
@@ -199,18 +241,23 @@ int md_checkmc1(struct MD18V25 *md, uint16_t rpm)
 //  md_get_state();
   
   acs709_get_mA(md->acs709_viout_pin,md->acs709_vzcr,&mc);
+//  acs709_get_mA(md->acs709_viout_pin,md->acs709_vzcr_pin,&mc);
 //  Serial.print(mc);
 //  Serial.print(" ");
-  if(mc > g_md_curr_cutoff) {
+  if(mc >= g_md_curr_cutoff) {
     if(md->curr_cutoff_reached < 3) {
+//Serial.print("=== motor cutoff: ");
+//Serial.println(mc);
       md->curr_cutoff_reached++;
-Serial.print(md->dir_pin);
-Serial.print(" ");
-Serial.print(md->curr_cutoff_reached);
-Serial.println(" md cutoff reached");
+    } else {
+Serial.print("=== motor cutoff: ");
+Serial.println(mc);
+      md->overloaded=1;
     }
   } else {
-    md->curr_cutoff_reached=0;
+//    if(g_cb_md_stop == 1) {
+      md->curr_cutoff_reached=0;
+//    }
   }
   
   a=md->mcra->getAverage();
@@ -243,8 +290,6 @@ int md_checkmc(void)
 int md_setspeed(void)
 {
 
-   if(g_recv_ready != 1) return(0);
-  
 //g_cb_m1s=48;  
 //g_cb_m1s=0;  
 //g_cb_m2s=45;  
@@ -252,30 +297,38 @@ int md_setspeed(void)
   
 /*
 if((g_cb_msl != 0) || (g_cb_msr != 0)) {  
+Serial.print("md setspeed ");
 Serial.print(g_cb_msl);
 Serial.print(" ");
 Serial.println(g_cb_msr);
 }
 */
 
-  if((g_batt_cutoff_reached != 0) || (g_mdl.curr_cutoff_reached >= 3) || (g_mdr.curr_cutoff_reached >= 3)) {
-    if(g_cb_msl > 90) {
-      g_cb_msl=90;
-    } else if(g_cb_msl < 90) {
-      g_cb_msl=-90;
-    }
-    if(g_cb_msr > 90) {
-      g_cb_msr=90;
-    } else if(g_cb_msr < 90) {
-      g_cb_msr=-90;
-    }
-  }
 
-if((g_cb_msl != 0) || (g_cb_msr != 0)) {  
-  Serial.print(g_cb_msl);
-  Serial.print(" ");
-  Serial.println(g_cb_msr);
-}
+  if((g_batt_cutoff_reached == 0) && (g_mdl.overloaded == 0) && (g_mdr.overloaded == 0)) {
+    if(g_recv_ready != 1) return(0);
+  } else {
+    if(g_cb_md_stop != 1) {
+      g_cb_msl=0;
+      g_cb_msr=0;
+    } else {
+      g_mdl.overloaded=0;
+      g_mdr.overloaded=0;
+    }
+
+/*    
+    if(g_cb_msl > SH2_MOTORSPEED_LIMIT) {
+      g_cb_msl=SH2_MOTORSPEED_LIMIT;
+    } else if(g_cb_msl < -SH2_MOTORSPEED_LIMIT) {
+      g_cb_msl=-SH2_MOTORSPEED_LIMIT;
+    }
+    if(g_cb_msr > SH2_MOTORSPEED_LIMIT) {
+      g_cb_msr=SH2_MOTORSPEED_LIMIT;
+    } else if(g_cb_msr < -SH2_MOTORSPEED_LIMIT) {
+      g_cb_msr=-SH2_MOTORSPEED_LIMIT;
+    }
+*/    
+  }
 
   MD18V25_setpwr(&g_mdl,-g_cb_msl);
   MD18V25_setpwr(&g_mdr,g_cb_msr);

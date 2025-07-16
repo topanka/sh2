@@ -14,6 +14,8 @@ int comm_setup(void)
   buildCRCTable();
 //  tmr_init(&g_tmr_comm,250);
   tmr_init(&g_tmr_comm,200);
+
+  return(0);
 }
 
 int tscr_comm_pack1(byte *d, uint16_t l, byte *buf, uint16_t *len)
@@ -77,7 +79,7 @@ int comm_send(void)
 
 int comm_read(int *state, unsigned char *buf, unsigned int *len)
 {
-  int rval=-1,ret,nr=0;
+  int rval=-1,nr=0;
   unsigned char c1;
   unsigned char crc8;
 //  static unsigned long xx=0;
@@ -265,7 +267,7 @@ int comm_recv(void)
       if(poslight != g_cb_poslight) {
         g_cb_poslight=poslight;
         go_cb_poslight=poslight;
-        draw_poslight(g_cb_poslight);
+        draw_poslight(g_cb_poslight,0);
       }
     } else {
       if(g_cb_poslight == poslight) {
@@ -283,4 +285,6 @@ int tscr_comm(void)
 {
   comm_send();
   comm_recv();
+
+  return(0);
 }

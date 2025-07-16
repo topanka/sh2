@@ -14,6 +14,8 @@ int comm_setup(void)
 {
 //  Serial2.begin(9600);
   Serial2.begin(19200);
+
+  return(0);
 }
 
 int comm_pack1(byte *d, uint16_t l, byte *buf, uint16_t *len)
@@ -143,7 +145,7 @@ int comm_send(void)
 
 int comm_read(int *state, unsigned char *buf, unsigned int *len)
 {
-  int rval=-1,ret,nr=0;
+  int rval=-1,nr=0;
   unsigned char c1;
   unsigned char crc8;
 

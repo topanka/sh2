@@ -2,15 +2,15 @@
 //nagy kerek a szervon
 //#define SH1_RUDDERL_MIN                 900
 //#define SH1_RUDDERL_MAX                 2100
-#define SH1_RUDDERL_MIN                 1000
+#define SH1_RUDDERL_MIN                 1080
 #define SH1_RUDDERL_MAX                 1950
 
 #define SH1_RUDDERR_CENTER              1500
 //nagy kerek a szervon
 //#define SH1_RUDDERR_MIN                 900
 //#define SH1_RUDDERR_MAX                 2100
-#define SH1_RUDDERR_MIN                 1050
-#define SH1_RUDDERR_MAX                 2000
+#define SH1_RUDDERR_MIN                 1080
+#define SH1_RUDDERR_MAX                 1950
 
 #define SH1_HOLDERPAN_CENTER            1480
 #define SH1_HOLDERPAN_MIN               650
@@ -52,6 +52,12 @@ int servo_holder(void)
   vx=constrain(g_cb_tsxp,-100,100);
   vy=constrain(g_cb_tsyp,-100,100);
   if((vx == 0) && (vy == 0)) return(0);
+
+/*  
+Serial.print(g_cb_tsxp);
+Serial.print(" ");
+Serial.println(vx);
+*/
   
   if((g_millis-g_sh1_holder_t) < 40) return(0);
   

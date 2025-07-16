@@ -103,6 +103,10 @@ uint16_t g_sh1_mRrpm=0,go_sh1_mRrpm=0;
 #define POWER_A     60
 #define POWER_B     360
 
+#define REDRAW_X0   0
+#define REDRAW_Y0   460
+#define REDRAW_LEN  20
+
 int g_tscr_power=0;
 int g_tscr_rudder=0;
 char g_tscr_takeover=0;

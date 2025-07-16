@@ -59,6 +59,7 @@ int acs709_get_mA(unsigned char viout_pin, unsigned int vzcr, unsigned int *mA)
 
   if(viout >= vzcr) {
     a=5000.0*(viout-vzcr)/1023.0/0.028;
+//    a=(viout-vzcr)/0.028;
     if(a > UINT_MAX) {
       *mA=UINT_MAX;
     } else {
@@ -70,9 +71,10 @@ int acs709_get_mA(unsigned char viout_pin, unsigned int vzcr, unsigned int *mA)
 
 //  Serial.print(viout);
 //  Serial.print(" ");
+//  Serial.println();
 
 //if(g_cb_m2s > 0) {
-if(viout_pin == SH2SH_ACS709_VIOUTR_PORT) {
+//if(viout_pin == SH2SH_ACS709_VIOUTR_PORT) {
 //  Serial.println();
   /*
   Serial.print("VIOUT: ");
@@ -88,10 +90,65 @@ if(viout_pin == SH2SH_ACS709_VIOUTR_PORT) {
   Serial.print("mA=");
   */
 //  Serial.println(*mA);
-}
+//}
 //}
 
 
 //  Serial.print("mA=");
 //  Serial.println(*mA);
+  return(0);
+}
+
+int acs709_get_mA_pin(unsigned char viout_pin, unsigned int vzcr_pin, unsigned int *mA)
+{
+  unsigned int viout,vzcr;
+  float a;
+ 
+  viout=analogRead(viout_pin);
+  vzcr=analogRead(vzcr_pin);
+
+//  vzcr+=
+
+  if(viout >= vzcr) {
+    a=5000.0*(viout-vzcr)/1023.0/0.028;
+//    a=(viout-vzcr)/0.028;
+    if(a > UINT_MAX) {
+      *mA=UINT_MAX;
+    } else {
+      *mA=a;
+    }
+  } else {
+    *mA=0;
+  }
+
+//  Serial.print(viout);
+//  Serial.print(" ");
+//  Serial.print(vzcr);
+//  Serial.print(" ");
+//  Serial.println();
+
+//if(g_cb_m2s > 0) {
+//if(viout_pin == SH2SH_ACS709_VIOUTR_PORT) {
+//  Serial.println();
+  /*
+  Serial.print("VIOUT: ");
+  Serial.print(v1);
+  Serial.print(" ");
+  Serial.print(v2);
+  Serial.print(" ");
+  Serial.print(v3);
+  Serial.print(" ");
+  Serial.print(viout);
+  Serial.print(" ");
+  Serial.println(vzcr);
+  Serial.print("mA=");
+  */
+//  Serial.println(*mA);
+//}
+//}
+
+
+//  Serial.print("mA=");
+//  Serial.println(*mA);
+  return(0);
 }

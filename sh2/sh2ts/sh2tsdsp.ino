@@ -56,11 +56,14 @@ int dsp_setup(void)
   myGLCD.printNumI((long)go_cb_mLs,100,420);
   myGLCD.printNumI((long)go_cb_mRs,200,420);
 
-  draw_poslight(UCCB_PL_OFF);
+  draw_poslight(UCCB_PL_OFF,1);
   
   myGLCD.setColor(VGA_WHITE);
   myGLCD.print((char*)"Ver.:1.3/sh2",600,450);
   
+  myGLCD.setColor(VGA_SILVER);
+  myGLCD.fillRect(REDRAW_X0,REDRAW_Y0,REDRAW_X0+REDRAW_LEN,REDRAW_Y0+REDRAW_LEN);
+
   return(0);
 }
 
@@ -155,7 +158,6 @@ int drawPointer(int x0, int y0, int a, int r, int R)
 int animatePointer(int x0, int y0, int a, int r, int R, word bclr, word fclr)
 {
   static int l_x0=0,l_y0=0,l_a=0,l_r=0,l_R=0,f=1;
-  int x1,y1,x2,y2,x3,y3;
 
   if((l_x0 == x0) && (l_y0 == y0) && (l_a == a)) return(0);
 
@@ -171,6 +173,8 @@ int animatePointer(int x0, int y0, int a, int r, int R, word bclr, word fclr)
   l_r=r;
   l_R=R;
   f=0;
+
+  return(0);
 }
 
 
@@ -178,11 +182,9 @@ int compWheel(int x0, int y0, int ax, int R1, int R2, int a1, int b,
               int *x1, int *y1, int *x2, int *y2, int *x3, int *y3,
               int *x4, int *y4, int *xa, int *ya)
 {
-  int an,n,i;
+  int n,i;
 
   n=6;
-
-  an=360/n;
 
   for(i=0;i < n;i++) {
     *x1=x0+R2*SpeedTrig.cos(ax-a1);
@@ -224,6 +226,8 @@ int angle_write(int a)
   myGLCD.setFont(BigFont);
   yd=yd-myGLCD.getFontYsize()/4;
   myGLCD.print((char*)"o",xd,yd);
+
+  return(0);
 }
 
 int drawWheel(int x0, int y0, int a, int R1, int R2, int a1, int b, 
@@ -384,6 +388,8 @@ int pwr_percent(int pwr, int *spwr)
     if(*spwr > 100) *spwr=100;
     *spwr=-*spwr;
   }
+
+  return(0);
 }
 
 int pwr_write(int pwr)
@@ -419,6 +425,8 @@ int pwr_write(int pwr)
   xp=xp+myGLCD.getFontYsize()/2;
   yp=yp+myGLCD.getFontYsize()/2;
   myGLCD.drawLine(x,yp,xp,y);
+
+  return(0);
 }
 
 int drawPower(int x0, int y0, int a, int b, int pwr, word bclr, word fclr)
@@ -523,6 +531,8 @@ int tscr_display(void)
     myGLCD.setColor(VGA_YELLOW);
     myGLCD.printNumI((long)go_sh1_mRrpm,200,420);
   }
+
+  return(0);
 }
 
 #define POSLIGHT_X0        520
@@ -543,12 +553,12 @@ int draw_colrect(int x0, int y0, int a, int b, word c1, word c2)
   return(0);
 }
 
-int draw_poslight(int poslight)
+int draw_poslight(int poslight, int force)
 {
   int i,x0,y0;
   static int l_poslight=-1;
 
-  if(l_poslight == poslight) return(0);
+  if((l_poslight == poslight) && (force == 0)) return(0);
   l_poslight=poslight;
   g_cb_poslight=poslight;
   for(i=0;i < 3;i++) {
@@ -595,4 +605,6 @@ int draw_poslight(int poslight)
   myGLCD.setBackColor(g_dsp_background);
 
   g_force_send=1;  
+
+  return(0);
 }

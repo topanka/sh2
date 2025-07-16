@@ -16,7 +16,8 @@
 int g_battV=-1;
 int g_battA=-1;
 unsigned long g_batt_read_tmo=25;
-float g_batt_curr_cutoff=2.0;     //total current cutoff limit in A
+//float g_batt_curr_cutoff=50.0;     //total current cutoff limit in A
+float g_batt_curr_cutoff=3.0;     //total current cutoff limit in A, testing
 int g_batt_cutoff_reached=0;
 
 //temperature
@@ -83,7 +84,10 @@ uint8_t g_state_mr=0;
 
 MYTMR g_tmr_checkmc={0};
 
-unsigned int g_md_curr_cutoff=1000;     //md current cutoff limit in mA
+//unsigned int g_md_curr_cutoff=25000;          //md current cutoff limit in mA
+unsigned int g_md_curr_cutoff=1500;           //md current cutoff limit in mA, testing
+
+int g_cb_md_stop=0;
 
 //ACS709
 #define SH2SH_ACS709_VIOUTR_PORT              A2    //sensor output

@@ -23,10 +23,8 @@ int batt_setup(void)
   g_adjps_on=0;
 */  
   
-
   ump_digitalWrite(UCCB_ADJPS_ON_UMPPORT,UCCB_ADJPS_ON_ON);
   g_adjps_on=1;
-
 
   ump_pinMode(UCCB_ADJPS_LEVEL_UMPPORT,OUTPUT);
   ump_digitalWrite(UCCB_ADJPS_LEVEL_UMPPORT,UCCB_ADJPS_LEVEL_HIGH);
@@ -77,7 +75,7 @@ int batt_setup(void)
   
   rval=0;
   
-end:
+//end:
 
   return(rval);
 }
@@ -85,7 +83,6 @@ end:
 int batt_read(void)
 {
   unsigned char r; 
-  unsigned long bltmo;
   static unsigned long l_bltmo=0;
   static unsigned char l_ledstate=0;
 
@@ -226,8 +223,6 @@ int adjps_level_switch(void)
 
 int tscr_power_switch(void)
 {
-  int i;
-  
   if(g_tscr_on == UCCB_TSCR_ON_ON) {
     ump_digitalWrite(UCCB_TSCR_ON_UMPPORT,UCCB_TSCR_ON_ON);
   } else {

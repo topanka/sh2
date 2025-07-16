@@ -154,7 +154,8 @@ int eval_setup(void)
 
 int eval_md_speed(int *mls, int *m2s, int *rdd)
 {
-  long vx,vy,vz,v1,v2,q,Mx,My,vxn,vyn,vzn;
+  long vx,vy,vz,v1,v2,q,vxn,vyn,vzn;
+  long Mx,My;
   int rd0;
 
   vx=constrain(g_fsX,g_fs_minX,g_fs_maxX);
@@ -328,16 +329,16 @@ int eval_md_speed(int *mls, int *m2s, int *rdd)
     
   if(vx > 0) {
     if(vy == 0) {
-       *mls=-v1;
-       *m2s=v1;
+       *mls=v1;
+       *m2s=-v1;
     } else {
       *mls=v2;
       *m2s=v1;
     }
   } else {
     if(vy == 0) {
-      *mls=v1;
-      *m2s=-v1;
+      *mls=-v1;
+      *m2s=v1;
     } else {
       *mls=v1;
       *m2s=v2;

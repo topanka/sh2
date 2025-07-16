@@ -122,11 +122,13 @@ Serial.println(g_touchy);
     } else if((g_touchy <= POWER_Y0) && (g_touchx >= POWER_X0) && (g_touchx <= POWER_X0+POWER_A)) {
       animatePower(POWER_X0,POWER_Y0,POWER_A,POWER_B,g_touchy,g_dsp_background,g_tscr_power_color);
     } else if((g_touchx >= POSLIGHT_X0) && (g_touchy >= POSLIGHT_Y0) && (g_touchx <= (POSLIGHT_X0+POSLIGHT_A)) && (g_touchy <= (POSLIGHT_Y0+POSLIGHT_B))) {
-      draw_poslight(UCCB_PL_OFF);
+      draw_poslight(UCCB_PL_OFF,0);
     } else if((g_touchx >= (POSLIGHT_X0+1*(POSLIGHT_A+POSLIGHT_X_SHIFT))) && (g_touchy >= POSLIGHT_Y0) && (g_touchx <= (POSLIGHT_X0+1*(POSLIGHT_A+POSLIGHT_X_SHIFT)+POSLIGHT_A)) && (g_touchy <= (POSLIGHT_Y0+POSLIGHT_B))) {
-      draw_poslight(UCCB_PL_ON);
+      draw_poslight(UCCB_PL_ON,0);
     } else if((g_touchx >= (POSLIGHT_X0+2*(POSLIGHT_A+POSLIGHT_X_SHIFT))) && (g_touchy >= POSLIGHT_Y0) && (g_touchx <= (POSLIGHT_X0+2*(POSLIGHT_A+POSLIGHT_X_SHIFT)+POSLIGHT_A)) && (g_touchy <= (POSLIGHT_Y0+POSLIGHT_B))) {
-      draw_poslight(UCCB_PL_BLINK);
+      draw_poslight(UCCB_PL_BLINK,0);
+    } else if((g_touchx > REDRAW_X0) && (g_touchx < REDRAW_X0+REDRAW_LEN) && (g_touchy > REDRAW_Y0) && (g_touchy < REDRAW_Y0+REDRAW_LEN)) {
+      dsp_setup();
     }
   }
 

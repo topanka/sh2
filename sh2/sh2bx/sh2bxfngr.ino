@@ -26,7 +26,7 @@ unsigned long g_finscan_op_time=0;
 
 void timer_test(void)
 {
-  MYAVRTIMER mat;
+//  MYAVRTIMER mat={0};
 
   TCCR1A = 0b10100000; // Mega pin 5
   TCCR1B = 0b00010001; // Mega pin 3
@@ -50,9 +50,9 @@ void timer_test(void)
   OCR5B = 250;
   OCR5C = 250;
 
-  mat.tccr=&TCCR4A;
-  mat.icr=&ICR4;
-  mat.ocr=&OCR4C;
+//  mat.tccr=&TCCR4A;
+//  mat.icr=&ICR4;
+//  mat.ocr=&OCR4C;
   
 }
 
@@ -166,4 +166,6 @@ int finscan_op(unsigned int op_port)
 int finscan_cancel(void)
 {
   g_finscan_op_onprogress=0;
+
+  return(0);
 }

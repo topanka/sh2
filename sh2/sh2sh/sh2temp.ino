@@ -25,6 +25,8 @@ int temp_read(void)
   Serial.println("C");
 */
 //  totcurr();  
+//md_calibrate_vzcr();
+//md_calibrate_vzcr_offset();
 
   return(1);  
 }

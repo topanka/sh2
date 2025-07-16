@@ -105,7 +105,7 @@ int uccb_btn_check(UCCBBTN *btn, int *ev)
   btn->bsl_s=bs;
 //  bsl_t=now;
 
-end:
+//end:
 
   return(bs);
 }

@@ -105,7 +105,7 @@ int tscr_comm_send(void)
 
 int tscr_comm_read(int *state, unsigned char *buf, unsigned int *len)
 {
-  int rval=-1,ret,nr=0;
+  int rval=-1,nr=0;
   unsigned char c1;
   unsigned char crc8;
 
@@ -247,6 +247,8 @@ int tscr_comm(void)
 {
   tscr_comm_send();
   tscr_comm_recv();
+
+  return(0);
 }
 
 int tscr_md_speed(int *mls, int *m2s, int *rdd)

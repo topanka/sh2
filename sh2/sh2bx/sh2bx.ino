@@ -20,7 +20,7 @@ int smar_init(SMAR *smar, uint8_t loc, int port, uint8_t avn, unsigned int eqn, 
 int smar_reset(SMAR *smar);
 int scr_calib_clb(int dir, int *val, int c_val, int cp, eepromsave_ft eepromsave_f);
 
-#define UCCB_VERSION        "1.3.7"
+#define UCCB_VERSION        "1.4.0"
 
 //battery
 #define UCCB_BATTV_PORT          A5

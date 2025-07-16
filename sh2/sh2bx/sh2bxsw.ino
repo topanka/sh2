@@ -11,7 +11,7 @@
 #define SW10P_10     953
 */
 
-/*
+
 #define SW10P_1      92
 #define SW10P_2      188
 #define SW10P_3      283
@@ -22,8 +22,9 @@
 #define SW10P_8      758
 #define SW10P_9      853
 #define SW10P_10     947
-*/
 
+
+/*
 #define SW10P_1      92
 #define SW10P_2      185
 #define SW10P_3      277
@@ -34,6 +35,7 @@
 #define SW10P_8      740
 #define SW10P_9      834
 #define SW10P_10     925
+*/
 
 #define SW10P_GAP    20
 
@@ -51,7 +53,7 @@ int sw_setup(void)
   
   rval=0;
   
-end:
+//end:
 
   return(rval);
 }
@@ -64,11 +66,14 @@ int sw10p_readA(void)
 int sw10p_readP(void)
 {
   static int l_pos=-1;
-  static int o_pos=-1;
+  static int l_ppos=-1;
+  static int l_rpos=-1;
+  static int l_pcc=0;
+//  static int o_pos=-1;
   int pos;
 //  static unsigned long l_sw10prt=0;
   
-  if(tmr_do(&g_tmr_sw10p) != 1) return(l_pos);
+  if(tmr_do(&g_tmr_sw10p) != 1) return(l_rpos);
 //  if((millis()-l_sw10prt) < 25) return(l_pos);
   
   pos=smar_analogRead(&g_smar_sw10p);
@@ -77,9 +82,8 @@ int sw10p_readP(void)
 if(pos != o_pos) {
   Serial.println(pos);
 }
+o_pos=pos;
 */
-
-  o_pos=pos;
   
   if((pos > SW10P_1-SW10P_GAP) && (pos < SW10P_1+SW10P_GAP)) l_pos=1;
   else if((pos > SW10P_2-SW10P_GAP) && (pos < SW10P_2+SW10P_GAP)) l_pos=2;
@@ -93,9 +97,27 @@ if(pos != o_pos) {
   else if((pos > SW10P_10-SW10P_GAP) && (pos < SW10P_10+SW10P_GAP)) l_pos=10;
   else l_pos=0;
   
+  if(l_ppos > 0) {
+    if(l_pos == l_ppos) {
+      if(l_pcc > 0) l_pcc--;
+    } else {
+      l_pcc=5;
+      l_ppos=l_pos;
+    }
+  } else {
+    l_ppos=l_pos;
+  }
+  if(l_rpos > 0) {
+    if(l_pcc == 0) {
+      l_rpos=l_pos;
+    }
+  } else {
+    l_rpos=l_ppos;
+  }
+
 //  l_sw10prt=millis();
   
-  return(l_pos);
+  return(l_rpos);
 }
 
 int b6p_readA(void)

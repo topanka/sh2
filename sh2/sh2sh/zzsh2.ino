@@ -1,8 +1,5 @@
 void loop_counter(void)
 {
-  unsigned int m1c,m2c; 
-  int ba;
-  
   g_loop_cnt++;
   if((g_millis-g_loop_ct) > 1000) {
     g_loop_cps=g_loop_cnt;
@@ -37,6 +34,7 @@ void setup()
 
   delay(1000);
   batt_setup();
+  acs709_setup();
   md_setup();
   eval_setup();
   comm_setup();
@@ -44,7 +42,6 @@ void setup()
   light_setup();
   qe_setup();
   temp_setup();
-  acs709_setup();
   
 //  Serial.begin(115200);
   

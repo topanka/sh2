@@ -72,18 +72,30 @@ void batt_curr_cutoff(int ba)
   voltage=(5.0/1023.0)*ba;
   voltage=voltage-g_ACS770_QOV+0.015;
 
+  Serial.print("*** batt amp: ");
+  Serial.println(voltage);
+
   if(voltage > g_ACS770_cutoff) {
-    l_limit++;
+    Serial.print("*** batt cutOff1: ");
+    Serial.println(voltage);
+    if(l_limit < 3) {
+      l_limit++;
+    }
     g_batt_read_tmo=10;
   } else {
-    l_limit=0;
-    g_batt_read_tmo=25;
-    g_batt_cutoff_reached=0;
+    if(l_limit < 3) {
+      l_limit=0;
+    }
+    if(g_cb_md_stop == 1) {
+      l_limit=0;
+      g_batt_read_tmo=25;
+      g_batt_cutoff_reached=0;
+    }
   }
 
-  if(l_limit > 3) {
+  if((l_limit >= 3) && (g_batt_cutoff_reached != 1)) {
     g_batt_cutoff_reached=1;
-    Serial.print("cutOff: ");
+    Serial.print("*** batt cutOff: ");
     Serial.print(g_ACS770_cutoff);
     Serial.println(" reached");
   }
@@ -93,7 +105,6 @@ void totcurr(void)
 {
   float voltage;
   float current;
-  int l_limit=0;
 
   voltage=(5.0/1023.0)*g_battA;
   voltage=voltage-g_ACS770_QOV+0.015;

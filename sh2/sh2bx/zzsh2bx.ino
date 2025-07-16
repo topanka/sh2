@@ -47,7 +47,35 @@ void loop()
 
   joy_ts_read(&g_tsX,&g_tsY);
   joy_fs_read(&g_fsX,&g_fsY,&g_fsZ);
-   
+
+
+//if(g_fsZ > 0) {
+/*  
+if(g_loop_cnt%1000 == 0) {
+  Serial.print(g_fsX);
+  Serial.print(" ");
+  Serial.print(g_fsY);
+  Serial.print(" ");
+  Serial.print(g_fsZ);
+  Serial.print(" ");
+  Serial.println();
+}
+*/
+
+
+  joy_fs_refine(&g_fsX,&g_fsY,&g_fsZ);
+
+/*
+if(g_fsZ > 0) {
+  Serial.print(g_fsX);
+  Serial.print(" ");
+  Serial.print(g_fsY);
+  Serial.print(" ");
+  Serial.print(g_fsZ);
+  Serial.print(" ");
+}
+*/
+
   g_fsBS=joy_fs_btn(&g_fsBE);
 //g_fsBE=BTN_NOP;
 

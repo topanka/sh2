@@ -6,7 +6,6 @@ byte g_r_commbuf[100]={0};
 int g_r_state=UCCB_PST_INIT;
 unsigned int g_r_len=0;
 byte g_commmode=1;
-unsigned long g_commmode_t=0;
 
 int comm_setup(void)
 {
@@ -99,7 +98,7 @@ int comm_send(void)
 
 int comm_read(int *state, unsigned char *buf, unsigned int *len)
 {
-  int rval=-1,ret,nr=0;
+  int rval=-1,nr=0;
   unsigned char c1;
   unsigned char crc8;
 //  static unsigned long xx=0;
@@ -271,9 +270,25 @@ int comm_recv(void)
     if((unsigned int)(stb&UCCB_ST_M2) == 0) g_cb_msr=0;
     g_cb_lightpos=(int)((stb&UCCB_ST_POSLIGHT)>>UCCB_PL_STPOS);
     if((unsigned int)(stb&UCCB_ST_MD_RESET) == UCCB_ST_MD_RESET) g_cb_mdreset=1;
+
+
+    if((g_cb_msl == 0) && (g_cb_msr == 0)) {
+      g_cb_md_stop=1;
+    } else {
+      g_cb_md_stop=0;
+    }
+    
     
     g_recv_ready=1;
 //    Serial.println("packet read");
+/*
+    Serial.print("packet read");
+    Serial.print(g_cb_msl);
+    Serial.print(" ");
+    Serial.print(g_cb_msr);
+    Serial.print(" ");
+    Serial.println(g_cb_md_stop);
+*/    
     return(1);
   }
 
