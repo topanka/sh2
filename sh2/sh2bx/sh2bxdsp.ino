@@ -74,6 +74,7 @@ byte h3[8] = {
 };
 
 unsigned long g_dsp_lastprinttime=0;
+unsigned long g_dsp_rmdtm=0;
 int g_clb_phase=UCCB_DSP_CLB_TSCENX_TXT;
 int g_tools_sml=0;
 int8_t g_sh2_sendingreset=0;
@@ -1461,9 +1462,12 @@ void dsp_scr_ship3(int force)
   static int l_mode=0;
   int diff,l2p;
 
+Serial.println(g_sh1_mdreset);
+
   if(force == 1) l_mode=0;
   if(l_mode == 1) l_mode=2;
-  if(l_mode == 0) {
+//  if(l_mode == 0) {
+  if((l_mode == 0) && (g_sh1_mdreset == 0)) {
     l_sh1_poslight=g_sh1_poslight;
     l_sh1_maxmspeed=g_sh1_maxmspeed;
     l_sh1_rotscale=g_sh1_rotscale;
@@ -1503,9 +1507,11 @@ void dsp_scr_ship3(int force)
       }
     }
   } else {
-    if(g_key == UCCB_KEY_CANCEL) {
-      l_mode=0;
-      lcd.noBlink();
+    if(g_sh1_mdreset == 0) {
+      if(g_key == UCCB_KEY_CANCEL) {
+        l_mode=0;
+        lcd.noBlink();
+      }
     }
   }
   
@@ -1666,9 +1672,18 @@ void dsp_scr_ship3(int force)
       } else {
         lcd.print(" ");
       }
-      if(g_sh1_mdreset == 1) {
+      if((g_sh1_mdreset == 1) ||
+         (g_sh1_mdreset == 2)) {
         lcd.print("Reseting MD18V25...");
+        if(g_sh1_mdreset == 1) {
+          g_dsp_rmdtm=g_millis;
+        }
       } else {
+        if(g_sh1_mdreset > 0) {
+          g_sh1_mdreset=0;
+          l_mode=0;
+          lcd.noBlink();
+        }
         lcd.print("Reset MD18V25  (0) ");
       }
       l2p++;
@@ -1988,7 +2003,7 @@ void dsp_print(void)
     dsp_scr_startup();
     g_clb_phase=1;
     g_sh2_sendingreset=0;
- }
+  }
   if(g_b6pBE == 11) {
     g_sh1_poslight=UCCB_PL_ON;
     if(g_sw10p == 8) {
@@ -1999,6 +2014,12 @@ void dsp_print(void)
     if(g_sw10p == 8) {
       force=1;
     }
+  }
+  if(g_sh1_mdreset > 0) {
+    if((g_millis-g_dsp_rmdtm) > 1000) {
+      g_sh1_mdreset=4;
+    }
+    force=1;
   }
 
   if(g_sw10p != 6) {

@@ -55,7 +55,7 @@ Serial.println();
   if(g_sh1_poslight == UCCB_PL_BLINK) stb|=(UCCB_PL_BLINK<<UCCB_PL_STPOS);
   if(g_sh1_mdreset == 1) {
     stb|=UCCB_ST_MD_RESET;
-    g_sh1_mdreset=0;
+    g_sh1_mdreset=2;
     Serial.println("md reset sent");
   }
   
@@ -289,6 +289,7 @@ int comm_recv(void)
     else g_sh1_m2dir=-1;
     g_sh1_state_ml=mstate&0x0F;
     g_sh1_state_mr=mstate>>4;
+    if(g_sh1_mdreset == 2) g_sh1_mdreset=3;
   }
 //  g_commmode=1;
 

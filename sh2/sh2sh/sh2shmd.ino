@@ -306,14 +306,21 @@ Serial.println(g_cb_msr);
 
 
   if((g_batt_cutoff_reached == 0) && (g_mdl.overloaded == 0) && (g_mdr.overloaded == 0)) {
-    if(g_recv_ready != 1) return(0);
+    if(g_recv_ready != 1) {
+      if((g_millis-g_recv_ready_time) > 1000) {
+        g_cb_msl=0;
+        g_cb_msr=0;
+      } else {
+        return(0);
+      }
+    }
   } else {
-    if(g_cb_md_stop != 1) {
-      g_cb_msl=0;
-      g_cb_msr=0;
-    } else {
+    if(g_cb_md_stop == 1) {
       g_mdl.overloaded=0;
       g_mdr.overloaded=0;
+    } else {
+      g_cb_msl=0;
+      g_cb_msr=0;
     }
 
 /*    

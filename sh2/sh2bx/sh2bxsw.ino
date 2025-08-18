@@ -37,7 +37,7 @@
 #define SW10P_10     925
 */
 
-#define SW10P_GAP    20
+#define SW10P_GAP    30
 
 int sw_setup(void)
 {
@@ -69,7 +69,7 @@ int sw10p_readP(void)
   static int l_ppos=-1;
   static int l_rpos=-1;
   static int l_pcc=0;
-//  static int o_pos=-1;
+  static int o_pos=-1;
   int pos;
 //  static unsigned long l_sw10prt=0;
   
@@ -78,12 +78,12 @@ int sw10p_readP(void)
   
   pos=smar_analogRead(&g_smar_sw10p);
 
-/*
+
 if(pos != o_pos) {
   Serial.println(pos);
 }
 o_pos=pos;
-*/
+
   
   if((pos > SW10P_1-SW10P_GAP) && (pos < SW10P_1+SW10P_GAP)) l_pos=1;
   else if((pos > SW10P_2-SW10P_GAP) && (pos < SW10P_2+SW10P_GAP)) l_pos=2;

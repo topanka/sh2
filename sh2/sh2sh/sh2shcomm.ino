@@ -280,6 +280,7 @@ int comm_recv(void)
     
     
     g_recv_ready=1;
+    g_recv_ready_time=g_millis;
 //    Serial.println("packet read");
 /*
     Serial.print("packet read");

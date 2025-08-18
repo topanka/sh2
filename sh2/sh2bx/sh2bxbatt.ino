@@ -132,7 +132,7 @@ int batt_read(void)
         if(l_bltmo == 0) {
           l_bltmo=g_millis;
         } else {
-        if((g_millis-l_bltmo) > 3000) {
+        if((g_millis-l_bltmo) > 1500) {
             digitalWrite(UCCB_BATTSTATE_PORT,HIGH);
             l_bltmo=0;
             l_ledstate=1;

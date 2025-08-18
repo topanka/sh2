@@ -94,13 +94,13 @@ void loop()
   }
 */  
 
-/*
+
 Serial.print(t);
 Serial.print(" ");
 Serial.print(g_touchx);
 Serial.print(" ");
 Serial.println(g_touchy);
-*/
+
 
   if(t == 1) {
     x=g_touchx-WHEEL_X0;

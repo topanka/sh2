@@ -40,7 +40,7 @@ int tscr_comm_packtscr(uint16_t *len)
   Serial.print(rpm1);
   Serial.print(" ");
 */  
-  Serial.println(g_tscr_power);
+//  Serial.println(g_tscr_power);
 
   tscr_comm_pack1((byte*)&lead,sizeof(lead),g_wts_commbuf,len);      //1:1
   tscr_comm_pack1((byte*)&g_loop_cps,sizeof(g_loop_cps),g_wts_commbuf,len);    //4:5

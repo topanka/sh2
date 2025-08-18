@@ -16,8 +16,8 @@
 int g_battV=-1;
 int g_battA=-1;
 unsigned long g_batt_read_tmo=25;
-//float g_batt_curr_cutoff=50.0;     //total current cutoff limit in A
-float g_batt_curr_cutoff=3.0;     //total current cutoff limit in A, testing
+float g_batt_curr_cutoff=50.0;     //total current cutoff limit in A
+//float g_batt_curr_cutoff=10.0;     //total current cutoff limit in A, testing
 int g_batt_cutoff_reached=0;
 
 //temperature
@@ -27,10 +27,11 @@ MYTMR g_tmr_temperature={0};
 
 //general
 unsigned long g_millis=0;
-unsigned long g_loop_cnt=0;         //loop counter
-unsigned long g_loop_cps=0;         //loop counter per sec
+unsigned long g_loop_cnt=0;           //loop counter
+unsigned long g_loop_cps=0;           //loop counter per sec
 unsigned long g_loop_ct=0;
-int g_recv_ready=0;                 //uccb command received
+int g_recv_ready=0;                   //uccb command received
+unsigned long g_recv_ready_time=0;    //uccb command received
 
 //UCCB
 
@@ -84,8 +85,8 @@ uint8_t g_state_mr=0;
 
 MYTMR g_tmr_checkmc={0};
 
-//unsigned int g_md_curr_cutoff=25000;          //md current cutoff limit in mA
-unsigned int g_md_curr_cutoff=1500;           //md current cutoff limit in mA, testing
+unsigned int g_md_curr_cutoff=25000;          //md current cutoff limit in mA
+//unsigned int g_md_curr_cutoff=6000;           //md current cutoff limit in mA, testing
 
 int g_cb_md_stop=0;
 

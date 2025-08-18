@@ -10,6 +10,9 @@ int dsp_setup(void)
 
   myGLCD.setColor(VGA_RED);
   myGLCD.fillCircle(WHEEL_X0,WHEEL_Y0,WHEEL_R0);
+
+//return(0);
+
   myGLCD.setColor(VGA_GREEN);
   myGLCD.drawCircle(WHEEL_X0,WHEEL_Y0,WHEEL_R1);
   myGLCD.drawCircle(WHEEL_X0,WHEEL_Y0,WHEEL_R2);
