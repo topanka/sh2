@@ -1,13 +1,13 @@
 #define BTN_NOP               0        //no operation
 #define BTN_HOLD              1        //hold
-#define BTN_RFH               2        //release from hold
+#define BTN_RFH_BASE          80       //release from hold
 #define BTN_CLK_BASE          10       //click
 
 /*
 #define BTN_LOW_TMO           200
 #define BTN_HIGH_TMO          500
 */
-#define BTN_LOW_TMO           200
+#define BTN_LOW_TMO           250
 #define BTN_HIGH_TMO          600
 
 
@@ -41,7 +41,7 @@ int uccb_btn_check(UCCBBTN *btn, int *ev)
   } else {
     bs=digitalRead(btn->port);
   }
-  
+
   if(bs > btn->last_not_low) {
     btn->last_not_low=bs;
   }
@@ -85,7 +85,7 @@ int uccb_btn_check(UCCBBTN *btn, int *ev)
   if(bs == LOW) {
     if((g_millis-btn->bsl_t) > BTN_HIGH_TMO) {
       if(btn->hop == 1) {
-        *ev=BTN_RFH;
+        *ev=BTN_RFH_BASE+btn->bsl_s;
         btn->hop=0;
       } else {
 //        *ev=btn->clkn+BTN_CLK_BASE;

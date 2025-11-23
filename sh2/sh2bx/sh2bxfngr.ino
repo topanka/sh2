@@ -134,7 +134,7 @@ int finscan_op(unsigned int op_port)
   }
   g_finscan_op_succ=digitalRead(FIM5360_SUCC_PORT);
   g_finscan_op_fail=digitalRead(FIM5360_FAIL_PORT);
-  if(g_finscan_op_succ == HIGH) {
+  if((g_finscan_op_succ == HIGH) && (g_finscan_op_fail != HIGH)) {
     if(g_finscan_op_time == 0) {
 //      Serial.println("SUCCESS");
       g_finscan_op_time=g_millis;

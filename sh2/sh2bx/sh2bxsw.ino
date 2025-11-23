@@ -39,6 +39,12 @@
 
 #define SW10P_GAP    30
 
+#define SW10P_ARTMO_SLEEP        50
+#define SW10P_ARTMO_ACTIVE       5
+
+
+static unsigned long g_sw10p_artmo=SW10P_ARTMO_SLEEP;
+
 int sw_setup(void)
 {
   int rval=-1;
@@ -48,8 +54,9 @@ int sw_setup(void)
   
   uccbbtn_init(&g_btn_b6p,UCCB_B6P_PORT,1);
   
-  tmr_init(&g_tmr_sw10p,25);
-  tmr_init(&g_tmr_b6p,5);
+//  tmr_init(&g_tmr_sw10p,25);
+  tmr_init(&g_tmr_sw10p,g_sw10p_artmo);
+  tmr_init(&g_tmr_b6p,4);
   
   rval=0;
   
@@ -69,7 +76,7 @@ int sw10p_readP(void)
   static int l_ppos=-1;
   static int l_rpos=-1;
   static int l_pcc=0;
-  static int o_pos=-1;
+//  static int o_pos=-1;
   int pos;
 //  static unsigned long l_sw10prt=0;
   
@@ -78,11 +85,12 @@ int sw10p_readP(void)
   
   pos=smar_analogRead(&g_smar_sw10p);
 
-
+/*
 if(pos != o_pos) {
   Serial.println(pos);
 }
 o_pos=pos;
+*/
 
   
   if((pos > SW10P_1-SW10P_GAP) && (pos < SW10P_1+SW10P_GAP)) l_pos=1;
@@ -103,6 +111,8 @@ o_pos=pos;
     } else {
       l_pcc=5;
       l_ppos=l_pos;
+      g_sw10p_artmo=SW10P_ARTMO_ACTIVE;
+tmr_init(&g_tmr_sw10p,g_sw10p_artmo);
     }
   } else {
     l_ppos=l_pos;
@@ -110,6 +120,10 @@ o_pos=pos;
   if(l_rpos > 0) {
     if(l_pcc == 0) {
       l_rpos=l_pos;
+      if(g_sw10p_artmo == SW10P_ARTMO_ACTIVE) {
+        g_sw10p_artmo=SW10P_ARTMO_SLEEP;
+        tmr_init(&g_tmr_sw10p,g_sw10p_artmo);
+      }
     }
   } else {
     l_rpos=l_ppos;
@@ -137,8 +151,6 @@ int b6p_readP(void)
   
   pos=smar_analogRead(&g_smar_b6p);
   
-//Serial.println(pos);
-  
   if((pos > SW10P_1-SW10P_GAP) && (pos < SW10P_1+SW10P_GAP)) pos=1;
   else if((pos > SW10P_2-SW10P_GAP) && (pos < SW10P_2+SW10P_GAP)) pos=2;
   else if((pos > SW10P_3-SW10P_GAP) && (pos < SW10P_3+SW10P_GAP)) pos=3;
@@ -146,7 +158,7 @@ int b6p_readP(void)
   else if((pos > SW10P_5-SW10P_GAP) && (pos < SW10P_5+SW10P_GAP)) pos=5;
   else if((pos > SW10P_6-SW10P_GAP) && (pos < SW10P_6+SW10P_GAP)) pos=6;
   else pos=0;
-  
+
   if(pos > 0) {
     if(lpos == pos) {
       if(lpos_cnt > 5) {

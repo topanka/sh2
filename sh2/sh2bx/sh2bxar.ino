@@ -42,6 +42,7 @@ int smar_analogRead(SMAR *smar)
 
   if(smar->loc == SMAR_ADCLOC_ARDUINO) {
     sv=analogRead(smar->port);
+//    sv=analogReadFast(smar->port);
   } else if(smar->loc == SMAR_ADCLOC_MCP3008) {
     sv=adc_single_channel_read(smar->port);
   } else {

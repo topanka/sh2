@@ -73,6 +73,17 @@ byte h3[8] = {
   0b11000
 };
 
+byte h4[8] = {
+  0b11000,
+  0b00100,
+  0b00110,
+  0b00111,
+  0b00110,
+  0b00100,
+  0b11000,
+  0b00000
+};
+
 unsigned long g_dsp_lastprinttime=0;
 unsigned long g_dsp_rmdtm=0;
 int g_clb_phase=UCCB_DSP_CLB_TSCENX_TXT;
@@ -91,6 +102,12 @@ int numPlaces(unsigned long n)
   if (n < 100000000) return 8;
   if (n < 1000000000) return 9;
   return 10;
+}
+
+void printRowSelector(void)
+{
+  lcd.write((byte)3);
+//  lcd.print(">");
 }
 
 int printSpaces(long n, int l)
@@ -122,6 +139,7 @@ void dsp_setup(void)
   lcd.createChar(0,h1);
   lcd.createChar(1,h2);
   lcd.createChar(2,h3);
+  lcd.createChar(3,h4);
   tmr_init(&g_tmr_lcd,50);
 }
 
@@ -410,6 +428,7 @@ void dsp_scr_b6p(int force)
     lcd.setCursor(0,1);
     lcd.print(g_b6pBS);
     lcd.setCursor(2,1);
+/*    
     if(g_b6pBE != 0) {
       if(g_b6pBE == 1) {
         lcd.print("  ");
@@ -417,6 +436,14 @@ void dsp_scr_b6p(int force)
         lcd.print(g_b6pBE);
       }
     }
+*/    
+    if(g_b6pBE != 0) {
+      lcd.setCursor(2,1);
+      lcd.print("  ");
+      lcd.setCursor(2,1);
+      lcd.print(g_b6pBE);
+    }
+
     lcd.setCursor(5,1);
     lcd.print("b6p=");
     lcd.print(g_b6p,10);
@@ -507,6 +534,63 @@ void dsp_scr_ship1(int force)
   }
 }
 
+void dsp_scr_ship2_1(int force)
+{
+  static int l_battV=-1;
+  static int l_battA=-1;
+  static int l_temp=-1;
+  long xx;
+
+  if((force == 1) ||
+     (l_battV != g_sh1_battV) ||
+     (l_battA != g_sh1_battA) ||
+     (l_temp != g_sh1_temperature)) {
+    lcd.setCursor(0,1);
+    lcd.print("main:");
+    if(g_sh1_battV < 0) {
+      lcd.print("0.00");
+    } else {
+      xx=(g_sh1_battV_a*g_sh1_battV+g_sh1_battV_b)/1000L;
+      lcd.print(xx/100,10);
+      lcd.print(".");
+      xx%=100;
+      if(xx < 10) {
+        lcd.print("0");
+      } 
+      lcd.print(xx,10);
+    }
+    lcd.print("V/");
+    l_battV=g_sh1_battV;
+    lcd.setCursor(11,1);
+    if(g_sh1_battA < 0) {
+      lcd.print("0.00");
+    } else {
+      xx=((5.0*g_sh1_battA)/1023.0-0.5+0.015)*25000.0;
+      if(xx < 0) {
+        lcd.print("0.00");
+      } else {
+        lcd.print(xx,10);
+      }
+    }
+    lcd.print("mA   ");
+    l_battA=g_sh1_battA;
+
+    lcd.setCursor(10,3);
+    lcd.print("T=");
+    if(g_sh1_temperature < 0) {
+      lcd.print(" -- ");
+    } else {
+      lcd.print(g_sh1_temperature/10,10);
+      lcd.print(".");
+      lcd.print(g_sh1_temperature%10,10);
+      lcd.print((char)223);
+      lcd.print("C ");
+      l_temp=g_sh1_temperature;
+    }
+  }
+}
+
+
 void dsp_scr_ship2(int force)
 {
   static unsigned int l_mlc=0;
@@ -525,10 +609,10 @@ void dsp_scr_ship2(int force)
   char buf[25];
   
   eval_joy_getpos(&x,&y,&z);
-  if(g_b6pBE == 31) {
+  if(g_b6pBE == 61) {
     g_sh1_m2on=(g_sh1_m2on+1)%2;
   }
-  if(g_b6pBE == 61) {
+  if(g_b6pBE == 31) {
     g_sh1_mlon=(g_sh1_mlon+1)%2;
   }
 
@@ -831,7 +915,8 @@ void dsp_scr_fingerscan(int force)
       if((g_key >= '0') && (g_key <= '9')) {
         if(l_pwd_pos+1 >= sizeof(l_pwd)) return;
         l_pwd[l_pwd_pos]=g_key;
-        lcd.print("*");
+//        lcd.print("*");
+          printRowSelector();
         l_pwd_pos++;
       } else if(g_key == UCCB_KEY_ENTER) {
         if(l_pwd_pos >= sizeof(l_pwd)) return;
@@ -894,7 +979,8 @@ void dsp_scr_fingerscan(int force)
     if((diff+1 >= 1) && (diff+1 <= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -910,7 +996,8 @@ void dsp_scr_fingerscan(int force)
     if((diff+2 >= 1) && (diff+2 <= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -926,7 +1013,8 @@ void dsp_scr_fingerscan(int force)
     if((diff+3 >= 1) && (diff+3 <= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -937,7 +1025,8 @@ void dsp_scr_fingerscan(int force)
     if((diff+4 >= 1) && (diff+4 <= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -948,7 +1037,8 @@ void dsp_scr_fingerscan(int force)
     if((diff+5 >= 1) && (diff+5 <= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -1055,7 +1145,8 @@ void dsp_scr_adjps(int force)
     if((diff+1 >= 1) && (diff+1 <= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -1071,7 +1162,8 @@ void dsp_scr_adjps(int force)
     if((diff+2 >= 1) && (diff+2 <= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -1089,7 +1181,8 @@ void dsp_scr_adjps(int force)
     if(((diff+3 >= 1) && (diff+3 <= 3)) && (UCCB_DSP_ADJPS_OI_NUM >= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -1100,7 +1193,8 @@ void dsp_scr_adjps(int force)
     if((diff+4 >= 1) && (diff+4 <= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -1111,7 +1205,8 @@ void dsp_scr_adjps(int force)
     if((diff+5 >= 1) && (diff+5 <= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -1212,7 +1307,8 @@ void dsp_scr_tscr(int force)
     if((diff+1 >= 1) && (diff+1 <= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -1228,7 +1324,8 @@ void dsp_scr_tscr(int force)
     if(((diff+2 >= 1) && (diff+2 <= 3)) && (UCCB_DSP_TSCR_OI_NUM >= 2)){
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -1239,7 +1336,8 @@ void dsp_scr_tscr(int force)
     if(((diff+3 >= 1) && (diff+3 <= 3)) && (UCCB_DSP_TSCR_OI_NUM >= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -1250,7 +1348,8 @@ void dsp_scr_tscr(int force)
     if((diff+4 >= 1) && (diff+4 <= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -1261,7 +1360,8 @@ void dsp_scr_tscr(int force)
     if((diff+5 >= 1) && (diff+5 <= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -1375,7 +1475,8 @@ void dsp_scr_tools(int force)
     if((diff+1 >= 1) && (diff+1 <= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -1386,7 +1487,8 @@ void dsp_scr_tools(int force)
     if((diff+2 >= 1) && (diff+2 <= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -1397,7 +1499,8 @@ void dsp_scr_tools(int force)
     if((diff+3 >= 1) && (diff+3 <= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -1408,7 +1511,8 @@ void dsp_scr_tools(int force)
     if((diff+4 >= 1) && (diff+4 <= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -1419,7 +1523,8 @@ void dsp_scr_tools(int force)
     if((diff+5 >= 1) && (diff+5 <= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -1461,8 +1566,6 @@ void dsp_scr_ship3(int force)
   static int l_key=NO_KEY;
   static int l_mode=0;
   int diff,l2p;
-
-Serial.println(g_sh1_mdreset);
 
   if(force == 1) l_mode=0;
   if(l_mode == 1) l_mode=2;
@@ -1592,7 +1695,8 @@ Serial.println(g_sh1_mdreset);
     if((diff+1 >= 1) && (diff+1 <= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -1611,7 +1715,8 @@ Serial.println(g_sh1_mdreset);
     if((diff+2 >= 1) && (diff+2 <= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -1628,7 +1733,8 @@ Serial.println(g_sh1_mdreset);
     if((diff+3 >= 1) && (diff+3 <= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -1645,7 +1751,8 @@ Serial.println(g_sh1_mdreset);
     if((diff+4 >= 1) && (diff+4 <= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -1668,7 +1775,8 @@ Serial.println(g_sh1_mdreset);
     if((diff+5 >= 1) && (diff+5 <= 3)) {
       lcd.setCursor(0,l2p);
       if(l_cli == l2p) {
-        lcd.print("*");
+//        lcd.print("*");
+        printRowSelector();
       } else {
         lcd.print(" ");
       }
@@ -1988,14 +2096,29 @@ void dsp_scr_battshutdown(void)
 void dsp_print(void)
 {
   static int l_sw10p=-1;
-  int force=0;
+  static int l_scr9alt=0;
+  int force=0,newscr=0;
 
   if((g_key == NO_KEY) && (g_fs_servo_on == 0)) {
-    if(tmr_do(&g_tmr_lcd) != 1) return;
+    if(g_b6pBE == 0) {
+      if(tmr_do(&g_tmr_lcd) != 1) return;
+    }
   }
     
   dsp_scr_battshutdown();
-  if((l_sw10p != g_sw10p) && (g_sw10p > 0)) {
+  if(g_sw10p == 9) {
+    if((g_b6pBS == 1) && (g_b6pBE == BTN_HOLD)) {
+      if(l_scr9alt == 0){
+        l_scr9alt=1;
+        newscr=1;
+      }
+    } else if((g_b6pBS == 0) && (g_b6pBE == BTN_RFH_BASE+1)) {
+      l_scr9alt=0;
+      newscr=1;
+    }
+  }
+
+  if(((l_sw10p != g_sw10p) && (g_sw10p > 0)) || (newscr == 1)) {
     lcd.clear();
     lcd.noBlink();
     l_sw10p=g_sw10p;
@@ -2054,7 +2177,11 @@ void dsp_print(void)
       dsp_scr_ship3(force);
       break;
     case 9:
-      dsp_scr_ship2(force);
+      if((g_b6pBS == 1) && (g_b6pBE == BTN_HOLD)) {
+        dsp_scr_ship2_1(force);
+      } else {
+        dsp_scr_ship2(force);
+      }
       break;
     case 10:
       dsp_scr_ship1(force);
