@@ -1,5 +1,26 @@
 #define WHEEL_PART          1
 
+
+/**
+ * Executes a hard-reset sequence tailored for the ITDB02-5.0 (SSD1963)
+ */
+void performDisplayHardwareReset() {
+  // Set the pin mode to output
+  pinMode(DISPLAY_RESET_PIN, OUTPUT);
+  
+  // Step 1: Drive reset HIGH to establish a clean initial state
+  digitalWrite(DISPLAY_RESET_PIN, HIGH);
+  delay(20); // Wait 20 milliseconds
+  
+  // Step 2: Pull reset LOW to trigger the hardware reset state
+  digitalWrite(DISPLAY_RESET_PIN, LOW);
+  delay(50); // Hold low for 50 milliseconds (SSD1963 requires > 5ms)
+  
+  // Step 3: Pull reset HIGH to exit the reset cycle
+  digitalWrite(DISPLAY_RESET_PIN, HIGH);
+  delay(150); // Critical: Wait 150ms for the display controller controller stabilization
+}
+
 int dsp_setup(void)
 {
   int pwr0;
